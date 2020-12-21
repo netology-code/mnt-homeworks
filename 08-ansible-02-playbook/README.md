@@ -4,7 +4,7 @@
 1. Создайте свой собственный (или используйте старый) публичный репозиторий на github с произвольным именем.
 2. Скачайте [playbook](./playbook/) из репозитория с домашним заданием и перенесите его в свой репозиторий.
 3. Подготовьте хосты в соотвтествии с группами из предподготовленного playbook. 
-4. Скачайте дистрибутив [java](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) и положите его в директорию `playbook/files/`. 
+4. Скачайте дистрибутив [java](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) и положите его в директорию `playbook/files/`. 
 
 ## Основная часть
 1. Приготовьте свой собственный inventory файл `prod.yml`.
