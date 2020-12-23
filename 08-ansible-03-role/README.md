@@ -2,9 +2,10 @@
 
 ## Подготовка к выполнению
 1. Создайте два пустых публичных репозитория в любом своём проекте: elastic-role и kibana-role.
-2. Скачайте [role](./role/) из репозитория с домашним заданием и перенесите его в свой репозиторий elastic-role.
+2. Скачайте [role](./roles/) из репозитория с домашним заданием и перенесите его в свой репозиторий elastic-role.
 3. Скачайте дистрибутив [java](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) и положите его в директорию `playbook/files/`. 
-4. Добавьте публичную часть своего ключа к своему профилю в github.
+4. Установите molecule: `pip3 install molecule`
+5. Добавьте публичную часть своего ключа к своему профилю в github.
 
 ## Основная часть
 
@@ -15,7 +16,7 @@
    ---
      - src: git@github.com:netology-code/mnt-homeworks-ansible.git
        scm: git
-       version: "0.1.0"
+       version: "1.0.1"
        name: java 
    ```
 2. При помощи `ansible-galaxy` скачать себе эту роль. Запустите  `molecule test`, посмотрите на вывод команды.
