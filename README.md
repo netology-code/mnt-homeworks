@@ -26,19 +26,21 @@
 
 9.3.
 
+
 ## Модуль 10. Системы мониторинга
 
 10.1. [Зачем и что нужно мониторить](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-01-base)
 
-10.02. [Системы мониторинга](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-02-systems)
+10.02. [Системы для мониторинга](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-02-systems)
 
-10.03. [Grafana](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-03-grafana)
+10.03. [Средство визуализации Grafana](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-03-grafana)
 
-10.04. [ELK](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-04-elk)
+10.04. [Система сбора логов ELK](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-04-elk)
 
-10.05. [Sentry](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-05-sentry)
+10.05. [Система-перехватчик ошибок Sentry](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-05-sentry)
 
-10.06
+10.06 [Инцедент-менеджмент]()
+
 
 ## Дополнительные материалы к лекциям
 [Дополнительные материалы к лекциям по Ansible](https://github.com/netology-code/mnt-homeworks/tree/master/08-ansible-additional)
