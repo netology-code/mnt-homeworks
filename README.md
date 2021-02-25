@@ -20,11 +20,25 @@
 
 ## Модуль 9. Система управления конфигурациями
 
-9.1
+9.1.
 
-9.2
+9.2.
 
-9.3
+9.3.
+
+## Модуль 10. Системы мониторинга
+
+10.1. [10.01. Зачем и что нужно мониторить](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-01-base)
+
+10.02. [Системы мониторинга](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-02-systems)
+
+10.03. [Grafana](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-03-grafana)
+
+10.04. [ELK](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-04-elk)
+
+10.05. [Sentry](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-05-sentry)
+
+10.06
 
 ## Дополнительные материалы к лекциям
 [Дополнительные материалы к лекциям по Ansible](https://github.com/netology-code/mnt-homeworks/tree/master/08-ansible-additional)
