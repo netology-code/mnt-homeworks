@@ -17,3 +17,14 @@
 8.3. [Работа с Roles](./08-ansible-03-role/README.md)
 
 8.4. [Создание собственных модулей](./08-ansible-04-module/README.md)
+
+## Модуль 9. Система управления конфигурациями
+
+9.1
+
+9.2
+
+9.3
+
+## Дополнительные материалы к лекциям
+[Дополнительные материалы к лекциям по Ansible](https://github.com/netology-code/mnt-homeworks/tree/master/08-ansible-additional)
