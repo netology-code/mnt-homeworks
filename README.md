@@ -41,7 +41,7 @@
 
 10.5. [Система-перехватчик ошибок Sentry](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-05-sentry)
 
-10.6. [Инцедент-менеджмент]()
+10.6. [Инцидент-менеджмент](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-06-incident-management)
 
 
 ## Дополнительные материалы к лекциям
