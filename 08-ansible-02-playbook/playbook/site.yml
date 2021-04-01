@@ -46,6 +46,7 @@
           mode: 0755
           timeout: 60
           force: true
+          validate_certs: false
         register: get_elastic
         until: get_elastic is succeeded
         tags: elastic
