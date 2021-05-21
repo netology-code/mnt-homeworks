@@ -3,7 +3,7 @@
 ## Подготовка к выполнению
 
 1. Поднимите инфраструктуру [teamcity](./teamcity/docker-compose.yml)
-2. Если хочется, можете создать свою собственную инфраструктуру на основе той технологии, которая нравится. Инструкция по установке из [документации](https://plugins.jetbrains.com/plugin/9017-ansible-runner)
+2. Если хочется, можете создать свою собственную инфраструктуру на основе той технологии, которая нравится. Инструкция по установке из [документации](https://www.jetbrains.com/help/teamcity/installing-and-configuring-the-teamcity-server.html)
 3. Дождитесь запуска teamcity, выполните первоначальную настройку
 4. Авторизуйте агент
 5. Сделайте fork [репозитория](https://github.com/aragastmatb/example-teamcity)
