@@ -12,7 +12,7 @@
     - VictoriaMetrics
     - Nagios
 
-3. Склонируйте себе [репозиторий](https://github.com/influxdata/TICK-docker/tree/master/1.3) и запустите TICK-стэк, 
+3. Склонируйте себе [репозиторий](https://github.com/influxdata/sandbox/tree/master) и запустите TICK-стэк, 
 используя технологии docker и docker-compose.
 
 В виде решения на это упражнение приведите выводы команд с вашего компьютера (виртуальной машины):
