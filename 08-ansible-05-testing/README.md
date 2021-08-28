@@ -1,11 +1,8 @@
-# Домашнее задание к занятию "08.03 Работа с Roles"
+# Домашнее задание к занятию "08.05 Тестирование Roles"
 
 ## Подготовка к выполнению
-1. Создайте два пустых публичных репозитория в любом своём проекте: elastic-role и kibana-role.
-2. Скачайте [role](./roles/) из репозитория с домашним заданием и перенесите его в свой репозиторий elastic-role.
-3. Скачайте дистрибутив [java](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) и положите его в директорию `playbook/files/`. 
-4. Установите molecule: `pip3 install molecule`
-5. Добавьте публичную часть своего ключа к своему профилю в github.
+1. Установите molecule: `pip3 install molecule`
+2. Установите tox: `pip3 install tox`
 
 ## Основная часть
 
