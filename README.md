@@ -10,13 +10,17 @@
 
 ## Модуль 8. Система управления конфигурациями
 
-8.1. [Введение в Ansible](./08-ansible-01-base/README.md)
+8.1. [Введение в Ansible](https://github.com/netology-code/mnt-homeworks/tree/MNT-7/08-ansible-01-based)
 
-8.2. [Работа с Playbook](./08-ansible-02-playbook/README.md)
+8.2. [Работа с Playbook]()
 
-8.3. [Работа с Roles](./08-ansible-03-role/README.md)
+8.3. [Использование YandexCloud]()
 
-8.4. [Создание собственных модулей](./08-ansible-04-module/README.md)
+8.4. [Работа с Roles]()
+
+8.5. [Тестирование Roles]()
+
+8.6. [Создание собственных модулей]()
 
 ## Модуль 9. Непрерывная разработка и интеграция
 
