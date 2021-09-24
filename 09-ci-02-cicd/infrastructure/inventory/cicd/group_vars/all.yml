@@ -1,0 +1,8 @@
+---
+jdk_url: https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_linux-x64_bin.tar.gz
+jdk_distr_name: openjdk-11+28_linux-x64_bin.tar.gz
+jdk_folder: "{{ jdk_distr_name.split('-')[:2] | join('-')  }}"
+java_home: "/opt/jdk/{{ jdk_folder }}"
+sonarqube_db_name: sonar
+sonarqube_db_user: sonar
+sonarqube_db_password: sonar
