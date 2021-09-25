@@ -1,0 +1,16 @@
+-Xms{{ nexus_java_heap_size }}
+-Xmx{{ nexus_java_heap_size }}
+-XX:MaxDirectMemorySize={{ nexus_java_max_direct_memory }}
+-XX:+UnlockDiagnosticVMOptions
+-XX:+UnsyncloadClass
+-XX:+LogVMOutput
+-XX:LogFile={{ nexus_directory_log }}/jvm.log
+-XX:-OmitStackTraceInFastThrow
+-Djava.net.preferIPv4Stack=true
+-Dkaraf.home=.
+-Dkaraf.base=.
+-Dkaraf.etc=etc/karaf
+-Djava.util.logging.config.file=etc/karaf/java.util.logging.properties
+-Dkaraf.data={{ nexus_directory_data }}
+-Djava.io.tmpdir={{ nexus_directory_tmp }}
+-Dkaraf.startLocalConsole=false
