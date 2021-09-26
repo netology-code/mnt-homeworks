@@ -76,6 +76,27 @@
         state: directory
         owner: "{{ jenkins_user_name }}"
         group: "{{ jenkins_user_group }}"
+    - name: Install some required
+      become_user: root
+      yum:
+        name:
+          - git
+          - python3
+        state: present
+    - name: Update pip
+      become_user: root
+      pip:
+        executable: pip3
+        name: pip
+        extra_args: --upgrade
+    - name: Install Ansible
+      pip:
+        executable: pip3
+        name:
+          - setuptools_rust
+          - wheel
+          - ansible<3.0
+        state: present
     - name: Install agent.jar
       get_url:
         url: "http://{{ hostvars['jenkins-master-01']['ansible_host'] }}:8080/jnlpJars/agent.jar"
