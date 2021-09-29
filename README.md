@@ -28,13 +28,13 @@
 
 9.2. [DevOps и SRE](./09-ci-02-devops/README.md)
 
-9.3. [Процессы CI/CD](./09-ci-02-cicd/README.md)
+9.3. [Процессы CI/CD](./09-ci-03-cicd/README.md)
 
-9.4. [Jenkins](./09-ci-03-jenkins/README.md)
+9.4. [Jenkins](./09-ci-04-jenkins/README.md)
 
-9.5. [Teamcity](./09-ci-04-teamcity/README.md)
+9.5. [Teamcity](./09-ci-05-teamcity/README.md)
 
-9.6. [Gitlab](./09-ci-05-gitlab/README.md)
+9.6. [Gitlab](./09-ci-06-gitlab/README.md)
 
 ## Модуль 10. Системы мониторинга
 
