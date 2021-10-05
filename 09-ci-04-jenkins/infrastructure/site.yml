@@ -27,11 +27,13 @@
       get_url:
         url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
         dest: /etc/yum.repos.d/jenkins.repo
+        validate_certs: false
     - name: Add Jenkins key
       become: true
       rpm_key:
         key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
         state: present
+        validate_certs: false
     - name: Install epel-release
       become: true
       yum:

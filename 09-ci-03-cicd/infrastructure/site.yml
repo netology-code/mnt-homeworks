@@ -57,6 +57,7 @@
       yum:
         name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
         state: present
+        validate_certs: false
 
     - name: Install PostgreSQL
       yum:
@@ -259,6 +260,7 @@
       get_url:
         dest: "{{ nexus_directory_package }}/nexus-{{ nexus_version }}.tar.gz"
         url: "{{ nexus_download_url }}/nexus-{{ nexus_version }}-unix.tar.gz"
+        validate_certs: false
 
     - name: Unpack Nexus
       become: true

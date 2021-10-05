@@ -2,14 +2,11 @@
 
 ## Подготовка к выполнению
 
-1. Установить jenkins по любой из [инструкций](https://www.jenkins.io/download/)
-2. Запустить и проверить работоспособность
-3. Сделать первоначальную настройку
-4. Настроить под свои нужды
-5. Поднять отдельный cloud
-6. Для динамических агентов можно использовать [образ](https://hub.docker.com/repository/docker/aragast/agent)
-7. Обязательный параметр: поставить label для динамических агентов: `ansible_docker`
-8.  Сделать форк репозитория с [playbook](https://github.com/aragastmatb/example-playbook)
+1. Создать 2 VM: для jenkins-master и jenkins-agent
+2. Установить jenkins при помощи playbook'a
+3. Запустить и проверить работоспособность
+4. Сделать первоначальную настройку
+5.  Сделать форк репозитория с [playbook](https://github.com/aragastmatb/example-playbook)
 
 ## Основная часть
 
