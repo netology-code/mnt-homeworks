@@ -3,12 +3,13 @@
 ## Подготовка к выполнению
 
 1. Создаём 2 VM в yandex cloud со следующими параметрами: 2CPU 4RAM Centos7(остальное по минимальным требованиям)
-2. Прописываем в [inventory](./infrastructure/inventory/cicd/hosts.yml) [playbook'a](./infrastructure/site.yml) созданные хосты.
-3. Запускаем playbook, ожидаем успешного завершения
-4. Проверяем готовность Sonarqube через [браузер](http://localhost:9000)
-5. Заходим под admin\admin, меняем пароль на свой
-6.  Проверяем готовность Nexus через [бразуер](http://localhost:8081)
-7. Подключаемся под admin\admin123, меняем пароль, сохраняем анонимный доступ
+2. Прописываем в [inventory](./infrastructure/inventory/cicd/hosts.yml) [playbook'a](./infrastructure/site.yml) созданные хосты
+3. Добавляем в [files](./infrastructure/files/) файл со своим публичным ключом (id_rsa.pub). Если ключ называется иначе - найдите таску в плейбуке, которая использует id_rsa.pub имя и исправьте на своё
+4. Запускаем playbook, ожидаем успешного завершения
+5. Проверяем готовность Sonarqube через [браузер](http://localhost:9000)
+6. Заходим под admin\admin, меняем пароль на свой
+7.  Проверяем готовность Nexus через [бразуер](http://localhost:8081)
+8. Подключаемся под admin\admin123, меняем пароль, сохраняем анонимный доступ
 
 ## Знакомоство с SonarQube
 
@@ -44,8 +45,9 @@
 
 1. Скачиваем дистрибутив с [maven](https://maven.apache.org/download.cgi)
 2. Разархивируем, делаем так, чтобы binary был доступен через вызов в shell (или меняем переменную PATH или любой другой удобный вам способ)
-3. Проверяем `mvn --version`
-4. Забираем директорию [mvn](./mvn) с pom
+3. Удаляем из `apache-maven-<version>/conf/settings.xml` упоминание о правиле, отвергающем http соединение( раздел mirrors->id: my-repository-http-unblocker)
+4. Проверяем `mvn --version`
+5. Забираем директорию [mvn](./mvn) с pom
 
 ### Основная часть
 
