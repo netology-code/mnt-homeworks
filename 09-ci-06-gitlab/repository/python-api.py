@@ -8,9 +8,9 @@ api = Api(app)
 
 class Info(Resource):
     def get(self):
-        return {'version': 3, 'method': 'GET', 'message': 'Already started'} # Fetches first column that is Employee ID
+        return {'version': 3, 'method': 'GET', 'message': 'Already started'}
 
-api.add_resource(Info, '/get_info') # Route_1
+api.add_resource(Info, '/get_info')
 
 if __name__ == '__main__':
      app.run(host='0.0.0.0', port='5290')
