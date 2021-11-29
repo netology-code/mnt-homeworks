@@ -19,7 +19,7 @@
 
 ### Tox
 
-1. Запустите `docker run -it -v <path_to_repo>:/opt/elasticsearch-role -w /opt/elasticsearch-role /bin/bash`, где path_to_repo - путь до корня репозитория с elasticsearch-role на вашей файловой системе.
+1. Запустите `docker run --privileged=True -v <path_to_repo>:/opt/elasticsearch-role -w /opt/elasticsearch-role -it <image_name> /bin/bash`, где path_to_repo - путь до корня репозитория с elasticsearch-role на вашей файловой системе.
 2. Внутри контейнера выполните команду `tox`, посмотрите на вывод.
 3. Добавьте файл `tox.ini` в корень репозитория каждой своей роли.
 4. Создайте облегчённый сценарий для `molecule`. Проверьте его на исполнимость.
