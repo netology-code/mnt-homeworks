@@ -1,3 +1,6 @@
+# Max virtual memory areas vm.max_map_count must be least 262144
+# sysctl -w vm.max_map_count=262144
+
 version: '2.2'
 services:
 
@@ -69,8 +72,8 @@ services:
     ports:
       - 5046:5046
     volumes:
-      - ./configs/logstash.conf:/etc/logstash/conf.d/logstash.conf:Z
-      - ./configs/logstash.yml:/opt/logstash/config/logstash.yml:Z
+      - ./configs/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:Z
+      - ./configs/logstash.yml:/usr/share/logstash/config/logstash.yml:Z
     networks:
       - elastic
     depends_on:
