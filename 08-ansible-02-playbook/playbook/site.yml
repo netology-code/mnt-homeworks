@@ -1,72 +1,34 @@
 ---
-- name: Install Java
-  hosts: all
+- name: Install Clickhouse
+  hosts: clickhouse
+  handlers:
+    - name: Start clickhouse service
+      become: true
+      ansible.builtin.service:
+        name: clickhouse-server
+        state: restarted
   tasks:
-    - name: Set facts for Java 11 vars
-      set_fact:
-        java_home: "/opt/jdk/{{ java_jdk_version }}"
-      tags: java
-    - name: Upload .tar.gz file containing binaries from local storage
-      copy:
-        src: "{{ java_oracle_jdk_package }}"
-        dest: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"
-      register: download_java_binaries
-      until: download_java_binaries is succeeded
-      tags: java
-    - name: Ensure installation dir exists
+    - block:
+        - name: Get clickhouse distrib
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.noarch.rpm"
+            dest: "./{{ item }}-{{ clickhouse_version }}.rpm"
+          with_items: "{{ clickhouse_packages }}"
+      rescue:
+        - name: Get clickhouse distrib
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
+            dest: "./clickhouse-common-static-{{ clickhouse_version }}.rpm"
+    - name: Install clickhouse packages
       become: true
-      file:
-        state: directory
-        path: "{{ java_home }}"
-      tags: java
-    - name: Extract java in the installation directory
-      become: true
-      unarchive:
-        copy: false
-        src: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"
-        dest: "{{ java_home }}"
-        extra_opts: [--strip-components=1]
-        creates: "{{ java_home }}/bin/java"
-      tags:
-        - java
-    - name: Export environment variables
-      become: true
-      template:
-        src: jdk.sh.j2
-        dest: /etc/profile.d/jdk.sh
-      tags: java
-- name: Install Elasticsearch
-  hosts: elasticsearch
-  tasks:
-    - name: Upload tar.gz Elasticsearch from remote URL
-      get_url:
-        url: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ elastic_version }}-linux-x86_64.tar.gz"
-        dest: "/tmp/elasticsearch-{{ elastic_version }}-linux-x86_64.tar.gz"
-        mode: 0755
-        timeout: 60
-        force: true
-        validate_certs: false
-      register: get_elastic
-      until: get_elastic is succeeded
-      tags: elastic
-    - name: Create directrory for Elasticsearch
-      file:
-        state: directory
-        path: "{{ elastic_home }}"
-      tags: elastic
-    - name: Extract Elasticsearch in the installation directory
-      become: true
-      unarchive:
-        copy: false
-        src: "/tmp/elasticsearch-{{ elastic_version }}-linux-x86_64.tar.gz"
-        dest: "{{ elastic_home }}"
-        extra_opts: [--strip-components=1]
-        creates: "{{ elastic_home }}/bin/elasticsearch"
-      tags:
-        - elastic
-    - name: Set environment Elastic
-      become: true
-      template:
-        src: templates/elk.sh.j2
-        dest: /etc/profile.d/elk.sh
-      tags: elastic
+      ansible.builtin.yum:
+        name:
+          - clickhouse-common-static-{{ clickhouse_version }}.rpm
+          - clickhouse-client-{{ clickhouse_version }}.rpm
+          - clickhouse-server-{{ clickhouse_version }}.rpm
+      notify: Start clickhouse service
+    - name: Create database
+      ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc !=82
+      changed_when: create_db.rc == 0

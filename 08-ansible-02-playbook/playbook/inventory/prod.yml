@@ -1,6 +1,5 @@
 ---
-elasticsearch:
+clickhouse:
   hosts:
-    localhost:
-      ansible_connection: ssh
-      ansible_user: root
+    clickhouse-01:
+      ansible_host: <IP_here>
