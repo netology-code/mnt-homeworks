@@ -2,7 +2,7 @@
 
 ## Подготовка к выполнению
 
-1. Необходимо [зарегистрироваться](https://about.gitlab.com/free-trial/)
+1. Необходимо [подготовить gitlab к работе по инструкции](https://cloud.yandex.ru/docs/tutorials/infrastructure-management/gitlab-containers)
 2. Создайте свой новый проект
 3. Создайте новый репозиторий в gitlab, наполните его [файлами](./repository)
 4. Проект должен быть публичным, остальные настройки по желанию
