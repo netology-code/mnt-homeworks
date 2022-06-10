@@ -12,15 +12,15 @@
 
 8.1. [Введение в Ansible](./08-ansible-01-base)
 
-8.2. [Работа с Playbook](https://github.com/netology-code/mnt-homeworks/tree/MNT-13/08-ansible-02-playbook)
+8.2. [Работа с Playbook](./08-ansible-02-playbook)
 
-8.3. [Использование YandexCloud](https://github.com/netology-code/mnt-homeworks/tree/MNT-13/08-ansible-03-yandex)
+8.3. [Использование YandexCloud](./08-ansible-03-yandex)
 
-8.4. [Работа с Roles](https://github.com/netology-code/mnt-homeworks/tree/MNT-13/08-ansible-04-role)
+8.4. [Работа с Roles](./08-ansible-04-role)
 
-8.5. [Тестирование Roles](https://github.com/netology-code/mnt-homeworks/tree/MNT-13/08-ansible-05-testing)
+8.5. [Тестирование Roles](./08-ansible-05-testing)
 
-8.6. [Создание собственных модулей](https://github.com/netology-code/mnt-homeworks/tree/MNT-7/08-ansible-06-module)
+8.6. [Создание собственных модулей](./08-ansible-06-module)
 
 ## Модуль 9. Непрерывная разработка и интеграция
 
@@ -38,17 +38,17 @@
 
 ## Модуль 10. Системы мониторинга
 
-10.1. [Зачем и что нужно мониторить](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-01-base)
+10.1. [Зачем и что нужно мониторить](./10-monitoring-01-base)
 
-10.2. [Системы для мониторинга](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-02-systems)
+10.2. [Системы для мониторинга](./10-monitoring-02-systems)
 
-10.3. [Средство визуализации Grafana](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-03-grafana)
+10.3. [Средство визуализации Grafana](./10-monitoring-03-grafana)
 
-10.4. [Система сбора логов ELK](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-04-elk)
+10.4. [Система сбора логов ELK](./10-monitoring-04-elk)
 
-10.5. [Система-перехватчик ошибок Sentry](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-05-sentry)
+10.5. [Система-перехватчик ошибок Sentry](./10-monitoring-05-sentry)
 
-10.6. [Инцидент-менеджмент](https://github.com/netology-code/mnt-homeworks/tree/master/10-monitoring-06-incident-management)
+10.6. [Инцидент-менеджмент](/10-monitoring-06-incident-management)
 
 
 ## Дополнительные материалы к лекциям
