@@ -10,7 +10,7 @@
 
 ## Модуль 8. Система управления конфигурациями
 
-8.1. [Введение в Ansible](https://github.com/netology-code/mnt-homeworks/tree/MNT-7/08-ansible-01-base)
+8.1. [Введение в Ansible](./08-ansible-01-base)
 
 8.2. [Работа с Playbook](https://github.com/netology-code/mnt-homeworks/tree/MNT-13/08-ansible-02-playbook)
 
