@@ -2,7 +2,7 @@
 
 ## Подготовка к выполнению
 1. Установите molecule: `pip3 install "molecule==3.4.0"`
-2. Соберите локальный образ на основе [Dockerfile](./Dockerfile)
+2. Сделайте docker pull aragast/netology:latest -  это образ с podman, tox и несколькими пайтонами (3.7 и 3.9) внутри
 
 ## Основная часть
 
