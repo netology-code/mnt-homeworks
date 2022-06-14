@@ -2,7 +2,7 @@
 
 ## Подготовка к выполнению
 1. Установите molecule: `pip3 install "molecule==3.4.0"`
-2. Сделайте docker pull aragast/netology:latest -  это образ с podman, tox и несколькими пайтонами (3.7 и 3.9) внутри
+2. Выполните `docker pull aragast/netology:latest` -  это образ с podman, tox и несколькими пайтонами (3.7 и 3.9) внутри
 
 ## Основная часть
 
@@ -19,9 +19,9 @@
 ### Tox
 
 1. Добавьте в директорию с vector-role файлы из [директории](./example)
-2. Запустите `docker run --privileged=True -v <path_to_repo>:/opt/vector-role -w /opt/vector-role -it <image_name> /bin/bash`, где path_to_repo - путь до корня репозитория с vector-role на вашей файловой системе.
+2. Запустите `docker run --privileged=True -v <path_to_repo>:/opt/vector-role -w /opt/vector-role -it aragast/netology:latest /bin/bash`, где path_to_repo - путь до корня репозитория с vector-role на вашей файловой системе.
 3. Внутри контейнера выполните команду `tox`, посмотрите на вывод.
-5. Создайте облегчённый сценарий для `molecule`. Проверьте его на исполнимость.
+5. Создайте облегчённый сценарий для `molecule` с драйвером `molecule_podman`. Проверьте его на исполнимость.
 6. Пропишите правильную команду в `tox.ini` для того чтобы запускался облегчённый сценарий.
 8. Запустите команду `tox`. Убедитесь, что всё отработало успешно.
 9. Добавьте новый тег на коммит с рабочим сценарием в соответствии с семантическим версионированием.
