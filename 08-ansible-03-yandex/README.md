@@ -4,6 +4,8 @@
 
 1. Подготовьте в Yandex Cloud три хоста: для `clickhouse`, для `vector` и для `lighthouse`.
 
+Ссылка на репозиторий LightHouse: https://github.com/VKCOM/lighthouse
+
 ## Основная часть
 
 1. Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает lighthouse.
