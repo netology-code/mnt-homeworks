@@ -65,6 +65,7 @@ clickhouse-01              : ok=0    changed=0    unreachable=0    failed=1    s
 8. Повторно запустите playbook с флагом `--diff` и убедитесь, что playbook идемпотентен.
    * Повторный запуск playbook с флагом `--diff` [свидетельствует](files/diff2.md) об иденпотентности конфигурации
 9. Подготовьте README.md файл по своему playbook. В нём должно быть описано: что делает playbook, какие у него есть параметры и теги.
+   * Мой [playbook](https://github.com/rowhe/mnt-hwk/blob/418f2b324d65412050623d56ea99efb0b3599a03/playbook/site.yml) для установки clickhouse+vector и его описание в файле [README.md](https://github.com/rowhe/mnt-hwk/blob/418f2b324d65412050623d56ea99efb0b3599a03/README.md)
    
 10. Готовый playbook выложите в свой репозиторий, поставьте тег `08-ansible-02-playbook` на фиксирующий коммит, в ответ предоставьте ссылку на него.
 
