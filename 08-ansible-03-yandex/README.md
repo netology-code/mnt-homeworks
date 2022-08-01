@@ -82,14 +82,57 @@ lighthouse:
 
 ```
 5. Запустите `ansible-lint site.yml` и исправьте ошибки, если они есть.
-6. Попробуйте запустить playbook на этом окружении с флагом `--check`.
-7. Запустите playbook на `prod.yml` окружении с флагом `--diff`. Убедитесь, что изменения на системе произведены.
+   * Устраняем все ошибки при выполнении `ansible-lint site.yaml`
 ```shell
+dpopov@dpopov-test:~/mnt-hwk/playbook$ ansible-lint site.yml
+WARNING  Overriding detected file kind 'yaml' with 'playbook' for given positional argument: site.yml
+dpopov@dpopov-test:~/mnt-hwk/playbook$
+```
+6. Попробуйте запустить playbook на этом окружении с флагом `--check`.
+   * Запускаем `sudo ansible-playbook -i inventory/prod.yml site.yml  --check` и получаем ошибки
+```shell
+dpopov@dpopov-test:~/mnt-hwk/playbook$ sudo ansible-playbook -i inventory/prod.yml site.yml  --check
+
+PLAY [all] *****************************************************************************************************************************************************************************************************************************
+
+TASK [Check for Python] ****************************************************************************************************************************************************************************************************************
+skipping: [clickhouse-01]
+skipping: [lighthouse-01]
+skipping: [vector-01]
+
+TASK [Install Python] ******************************************************************************************************************************************************************************************************************
+fatal: [clickhouse-01]: FAILED! => {"msg": "The conditional check 'check_python.rc != 0' failed. The error was: error while evaluating conditional (check_python.rc != 0): 'dict object' has no attribute 'rc'\n\nThe error appears to be in '/home/dpopov/mnt-hwk/playbook/site.yml': line 12, column 5, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n\n  - name: Install Python\n    ^ here\n"}
+fatal: [vector-01]: FAILED! => {"msg": "The conditional check 'check_python.rc != 0' failed. The error was: error while evaluating conditional (check_python.rc != 0): 'dict object' has no attribute 'rc'\n\nThe error appears to be in '/home/dpopov/mnt-hwk/playbook/site.yml': line 12, column 5, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n\n  - name: Install Python\n    ^ here\n"}
+fatal: [lighthouse-01]: FAILED! => {"msg": "The conditional check 'check_python.rc != 0' failed. The error was: error while evaluating conditional (check_python.rc != 0): 'dict object' has no attribute 'rc'\n\nThe error appears to be in '/home/dpopov/mnt-hwk/playbook/site.yml': line 12, column 5, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n\n  - name: Install Python\n    ^ here\n"}
+
+PLAY RECAP *****************************************************************************************************************************************************************************************************************************
+clickhouse-01              : ok=0    changed=0    unreachable=0    failed=1    skipped=1    rescued=0    ignored=0
+lighthouse-01              : ok=0    changed=0    unreachable=0    failed=1    skipped=1    rescued=0    ignored=0
+vector-01                  : ok=0    changed=0    unreachable=0    failed=1    skipped=1    rescued=0    ignored=0
+
+```
+7. Запустите playbook на `prod.yml` окружении с флагом `--diff`. Убедитесь, что изменения на системе произведены.
+   * После прогона плейбука "с нуля" получаем такой результат:
+```shell
+PLAY RECAP *****************************************************************************************************************************************************************************************************************************
+clickhouse-01              : ok=11   changed=8    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+lighthouse-01              : ok=13   changed=9    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+vector-01                  : ok=9    changed=6    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 8. Повторно запустите playbook с флагом `--diff` и убедитесь, что playbook идемпотентен.
+   * После повторного запуска плэйбука видим, что результат идемпотентен:
+```shell
+PLAY RECAP *****************************************************************************************************************************************************************************************************************************
+clickhouse-01              : ok=10   changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+lighthouse-01              : ok=12   changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+vector-01                  : ok=8    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+```
 9. Подготовьте README.md файл по своему playbook. В нём должно быть описано: что делает playbook, какие у него есть параметры и теги.
-10. Готовый playbook выложите в свой репозиторий, поставьте тег `08-ansible-03-yandex` на фиксирующий коммит, в ответ предоставьте ссылку на него.
+   * [Ссылка](https://github.com/rowhe/mnt-hwk/blob/3f71a5a1a61c250174bf3abad1580e89cf6af017/README.md) на README.md от плэйбука
+   
+11. Готовый playbook выложите в свой репозиторий, поставьте тег `08-ansible-03-yandex` на фиксирующий коммит, в ответ предоставьте ссылку на него.
+    * [Ссылка](git@github.com:rowhe/mnt-hwk.git) на репозиторий с работающим плэйбуком
 
 ---
 
