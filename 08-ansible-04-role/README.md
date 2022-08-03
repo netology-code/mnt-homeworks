@@ -31,7 +31,7 @@
 11. В ответ приведите ссылки на оба репозитория с roles и одну ссылку на репозиторий с playbook.
 * Получилось 5 ролей и 1 плейбук:
   - Роль clickhouse-role: [clickhouse-role](https://github.com/rowhe/clickhouse-role.git)
-  - Роль lighthouse-role: [lighthouse-role](https://ithub.com/rowhe/lighthouse-role.git)
+  - Роль lighthouse-role: [lighthouse-role](https://github.com/rowhe/lighthouse-role.git)
   - Роль nginx-role: [nginx-role](https://github.com/rowhe/nginx-role.git)
   - Роль python-role для установки на хост Python: [python-role](https://github.com/rowhe/python-role.git)
   - Роль required-role для установки некоторых недостающих утилит: [required-role](https://github.com/rowhe/required-role.git)
