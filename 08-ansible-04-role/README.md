@@ -29,14 +29,14 @@
 9. Переработайте playbook на использование roles. Не забудьте про зависимости lighthouse и возможности совмещения `roles` с `tasks`.
 10. Выложите playbook в репозиторий.
 11. В ответ приведите ссылки на оба репозитория с roles и одну ссылку на репозиторий с playbook.
-    * Получилось 5 ролей и 1 плейбук:
-    - Роль clickhouse-role: [git@github.com:rowhe/clickhouse-role.git]
-    - Роль lighthouse-role: [git@github.com:rowhe/lighthouse-role.git](git@github.com:rowhe/lighthouse-role.git)
-    - Роль nginx-role: [git@github.com:rowhe/nginx-role.git](git@github.com:rowhe/nginx-role.git)
-    - Роль python-role для установки на хост Python: [git@github.com:rowhe/python-role.git](git@github.com:rowhe/python-role.git)
-    - Роль required-role для установки некоторых недостающих утилит: [git@github.com:rowhe/required-role.git](git@github.com:rowhe/required-role.git)
-    - Роль vector-role: [git@github.com:rowhe/vector-role.git](git@github.com:rowhe/vector-role.git)
-    - Плейбук для этих ролей: [git@github.com:rowhe/mnt-hwk.git](git@github.com:rowhe/mnt-hwk.git)
+* Получилось 5 ролей и 1 плейбук:
+  - Роль clickhouse-role: [git@github.com:rowhe/clickhouse-role.git](git@github.com:rowhe/clickhouse-role.git)
+  - Роль lighthouse-role: [git@github.com:rowhe/lighthouse-role.git](git@github.com:rowhe/lighthouse-role.git)
+  - Роль nginx-role: [git@github.com:rowhe/nginx-role.git](git@github.com:rowhe/nginx-role.git)
+  - Роль python-role для установки на хост Python: [git@github.com:rowhe/python-role.git](git@github.com:rowhe/python-role.git)
+  - Роль required-role для установки некоторых недостающих утилит: [git@github.com:rowhe/required-role.git](git@github.com:rowhe/required-role.git)
+  - Роль vector-role: [git@github.com:rowhe/vector-role.git](git@github.com:rowhe/vector-role.git)
+  - Плейбук для этих ролей: [git@github.com:rowhe/mnt-hwk.git](git@github.com:rowhe/mnt-hwk.git)
 ---
 
 ### Как оформить ДЗ?
