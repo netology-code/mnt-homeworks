@@ -45,7 +45,7 @@
 
 1. Скачиваем дистрибутив с [maven](https://maven.apache.org/download.cgi)
 2. Разархивируем, делаем так, чтобы binary был доступен через вызов в shell (или меняем переменную PATH или любой другой удобный вам способ)
-3. Удаляем из `apache-maven-<version>/conf/settings.xml` упоминание о правиле, отвергающем http соединение( раздел mirrors->id: my-repository-http-unblocker)
+3. Удаляем из `apache-maven-<version>/conf/settings.xml` упоминание о правиле, отвергающем http соединение( раздел mirrors->id: my-repository-http-blocker)
 4. Проверяем `mvn --version`
 5. Забираем директорию [mvn](./mvn) с pom
 
