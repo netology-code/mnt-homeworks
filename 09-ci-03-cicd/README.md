@@ -29,7 +29,7 @@
 
 ### Основная часть
 
-1. В репозиторий `maven-public` загружаем артефакт с GAV параметрами:
+1. В репозиторий `maven-releases` загружаем артефакт с GAV параметрами:
    1. groupId: netology
    2. artifactId: java
    3. version: 8_282
