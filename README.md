@@ -38,15 +38,15 @@
 
 ## Системы мониторинга
 
-13. [Зачем и что нужно мониторить](./10-monitoring-01-base)
+13. [Введение в мониторинг](./10-monitoring-01-base)
 
-14. [Системы для мониторинга](./10-monitoring-02-systems)
+14. [Системы мониторинга](./10-monitoring-02-systems)
 
 15. [Средство визуализации Grafana](./10-monitoring-03-grafana)
 
-16. [Система сбора логов ELK](./10-monitoring-04-elk)
+16. [Система сбора логов Elastic Stack](./10-monitoring-04-elk)
 
-17. [Система-перехватчик ошибок Sentry](./10-monitoring-05-sentry)
+17. [Платформа мониторинга Sentry](./10-monitoring-05-sentry)
 
 18. [Инцидент-менеджмент](/10-monitoring-06-incident-management)
 
