@@ -8,24 +8,41 @@
 ## Основная часть
 В рамках основной части необходимо создать собственные workflow для двух типов задач: bug и остальные типы задач. Задачи типа bug должны проходить следующий жизненный цикл:
 1. Open -> On reproduce
-2. On reproduce <-> Open, Done reproduce
+2. On reproduce -> Open, Done reproduce
 3. Done reproduce -> On fix
-4. On fix <-> On reproduce, Done fix
+4. On fix -> On reproduce, Done fix
 5. Done fix -> On test
-6. On test <-> On fix, Done
-7. Done <-> Closed, Open
+6. On test -> On fix, Done
+7. Done -> Closed, Open
+
+* Пример настройки workflow для багов
+
+![Bug workflow](img/bug_workflow.png)
+
+* XML [шаблон](https://github.com/rowhe/mnt-homeworks/blob/5adaf18d3948058be1082ebd03d2979d809a3e9c/09-ci-01-intro/files/bug%20workflow.xml) workflow для багов
 
 Остальные задачи должны проходить по упрощённому workflow:
 1. Open -> On develop
-2. On develop <-> Open, Done develop
+2. On develop -> Open, Done develop
 3. Done develop -> On test
-4. On test <-> On develop, Done
-5. Done <-> Closed, Open
+4. On test -> On develop, Done
+5. Done -> Closed, Open
+
+* Пример настройки workflow для остальных задач
+
+![Other tasks](img/task_workflow.png)
+
+* XML [шаблон](https://github.com/rowhe/mnt-homeworks/blob/5adaf18d3948058be1082ebd03d2979d809a3e9c/09-ci-01-intro/files/task%20workflow.xml) для остальных задач
 
 Создать задачу с типом bug, попытаться провести его по всему workflow до Done. Создать задачу с типом epic, к ней привязать несколько задач с типом task, провести их по всему workflow до Done. При проведении обеих задач по статусам использовать kanban. Вернуть задачи в статус Open.
 Перейти в scrum, запланировать новый спринт, состоящий из задач эпика и одного бага, стартовать спринт, провести задачи до состояния Closed. Закрыть спринт.
 
+* Пример успешно завершенного спринта с несколькими задачами и багом
+
+![Sprint](img/jira1.png)
+
 Если всё отработало в рамках ожидания - выгрузить схемы workflow для импорта в XML. Файлы с workflow приложить к решению задания.
+
 
 ---
 
