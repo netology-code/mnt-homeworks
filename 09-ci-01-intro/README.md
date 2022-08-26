@@ -32,7 +32,7 @@
 
 ![Other tasks](img/task_workflow.png)
 
-* XML [шаблон](https://github.com/rowhe/mnt-homeworks/blob/5adaf18d3948058be1082ebd03d2979d809a3e9c/09-ci-01-intro/files/task%20workflow.xml) для остальных задач
+* XML [шаблон](https://github.com/rowhe/mnt-homeworks/blob/5adaf18d3948058be1082ebd03d2979d809a3e9c/09-ci-01-intro/files/task%20workflow.xml) workflow для остальных задач
 
 Создать задачу с типом bug, попытаться провести его по всему workflow до Done. Создать задачу с типом epic, к ней привязать несколько задач с типом task, провести их по всему workflow до Done. При проведении обеих задач по статусам использовать kanban. Вернуть задачи в статус Open.
 Перейти в scrum, запланировать новый спринт, состоящий из задач эпика и одного бага, стартовать спринт, провести задачи до состояния Closed. Закрыть спринт.
