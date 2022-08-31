@@ -158,9 +158,11 @@ OS name: "linux", version: "5.13.0-52-generic", arch: "amd64", family: "unix"
 [INFO] ------------------------------------------------------------------------
 
 ```
-3. Проверяем директорию `~/.m2/repository/`, находим наш артефакт
+3. Проверяем директорию, находим наш артефакт
    * Содержимое директории:
-   ![artifact](img/img_13.png)
+   
+   ![artifact](img/img_14.png)
+
 4. В ответе присылаем исправленный файл `pom.xml`
    * Исправленный `pom.xml`
 ```shell
@@ -168,27 +170,26 @@ OS name: "linux", version: "5.13.0-52-generic", arch: "amd64", family: "unix"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>netology</groupId>
-  <artifactId>java</artifactId>
-  <version>2_282</version>
+  <groupId>com.netology.app</groupId>
+  <artifactId>my-app</artifactId>
+  <version>01-SNAPSHOT</version>
    <repositories>
     <repository>
-      <id>my_repo</id>
-      <name>maven-releases</name>
-      <url>http://51.250.36.254:8081/repository/maven-releases</url>
+      <id>my-repo</id>
+      <name>maven-public</name>
+      <url>http://51.250.36.254:8081/repository/maven-releases/</url>
     </repository>
   </repositories>
   <dependencies>
-<!--     <dependency>
-      <groupId>somegroup</groupId>
-      <artifactId>someart</artifactId>
-      <version>somevers</version>
-      <classifier>someclass</classifier>
-      <type>sometype</type>
-    </dependency> -->
+    <dependency>
+      <groupId>netology</groupId>
+      <artifactId>java</artifactId>
+      <version>8_282</version>
+      <classifier>distrib</classifier>
+      <type>tar.gz</type>
+    </dependency>
   </dependencies>
 </project>
-
 ```
 ---
 
