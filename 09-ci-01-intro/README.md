@@ -15,6 +15,10 @@
 6. On test -> On fix, Done
 7. Done -> Closed, Open
 
+* Пример настройки workflow для багов
+![Bug workflow](img/bug_workflow.png)
+
+
 Остальные задачи должны проходить по упрощённому workflow:
 1. Open -> On develop
 2. On develop -> Open, Done develop
@@ -22,10 +26,19 @@
 4. On test -> On develop, Done
 5. Done -> Closed, Open
 
+* Пример настройки workflow для остальных задач
+![Other tasks](img/task_workflow.png)
+* []
 Создать задачу с типом bug, попытаться провести его по всему workflow до Done. Создать задачу с типом epic, к ней привязать несколько задач с типом task, провести их по всему workflow до Done. При проведении обеих задач по статусам использовать kanban. Вернуть задачи в статус Open.
 Перейти в scrum, запланировать новый спринт, состоящий из задач эпика и одного бага, стартовать спринт, провести задачи до состояния Closed. Закрыть спринт.
 
+* Пример успешно завершенного спринта с несколькими задачами и багом
+![Sprint](img/jira1.png)
+
 Если всё отработало в рамках ожидания - выгрузить схемы workflow для импорта в XML. Файлы с workflow приложить к решению задания.
+
+* [XML](files/task%20workflow.xml) схема для task workflow
+* [XML](files/bug%20workflow.xml) схема для bug workflow
 
 ---
 
