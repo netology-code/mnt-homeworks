@@ -1,0 +1,106 @@
+dpopov@dpopov-test:~/mnt-homeworks/09-ci-03-cicd$ sonar-scanner \
+  -Dsonar.projectKey=Super_proj \
+  -Dsonar.sources=./example \
+  -Dsonar.host.url=http://51.250.32.100:9000 \
+  -Dsonar.login=617ee3e195b8408401a2fec17210188762405a6a \
+> -Dsonar.coverage.exclusions=fail.py
+INFO: Scanner configuration file: /opt/sonar-scanner4/conf/sonar-scanner.properties
+INFO: Project root configuration file: NONE
+INFO: SonarScanner 4.7.0.2747
+INFO: Java 11.0.14.1 Eclipse Adoptium (64-bit)
+INFO: Linux 5.13.0-52-generic amd64
+INFO: User cache: /home/dpopov/.sonar/cache
+INFO: Scanner configuration file: /opt/sonar-scanner4/conf/sonar-scanner.properties
+INFO: Project root configuration file: NONE
+INFO: Analyzing on SonarQube server 9.1.0
+INFO: Default locale: "en", source code encoding: "UTF-8"
+INFO: Load global settings
+INFO: Load global settings (done) | time=148ms
+INFO: Server id: 9CFC3560-AYLzZfJk_xKxsv1d8XLf
+INFO: User cache: /home/dpopov/.sonar/cache
+INFO: Load/download plugins
+INFO: Load plugins index
+INFO: Load plugins index (done) | time=97ms
+INFO: Load/download plugins (done) | time=7104ms
+INFO: Process project properties
+INFO: Process project properties (done) | time=10ms
+INFO: Execute project builders
+INFO: Execute project builders (done) | time=2ms
+INFO: Project key: Super_proj
+INFO: Base dir: /home/dpopov/mnt-homeworks/09-ci-03-cicd
+INFO: Working dir: /home/dpopov/mnt-homeworks/09-ci-03-cicd/.scannerwork
+INFO: Load project settings for component key: 'Super_proj'
+INFO: Load project settings for component key: 'Super_proj' (done) | time=59ms
+INFO: Load quality profiles
+INFO: Load quality profiles (done) | time=139ms
+INFO: Load active rules
+INFO: Load active rules (done) | time=2908ms
+INFO: Indexing files...
+INFO: Project configuration:
+INFO:   Excluded sources for coverage: fail.py
+INFO: 1 file indexed
+INFO: 0 files ignored because of scm ignore settings
+INFO: Quality profile for py: Sonar way
+INFO: ------------- Run sensors on module Super_proj
+INFO: Load metrics repository
+INFO: Load metrics repository (done) | time=74ms
+INFO: Sensor Python Sensor [python]
+WARN: Your code is analyzed as compatible with python 2 and 3 by default. This will prevent the detection of issues specific to python 2 or python 3. You can get a more precise analysis by setting a python version in your configuration via the parameter "sonar.python.version"
+INFO: Starting global symbols computation
+INFO: 1 source file to be analyzed
+INFO: Load project repositories
+INFO: Load project repositories (done) | time=39ms
+INFO: 1/1 source file has been analyzed
+INFO: Starting rules execution
+INFO: 1 source file to be analyzed
+INFO: 1/1 source file has been analyzed
+INFO: Sensor Python Sensor [python] (done) | time=855ms
+INFO: Sensor Cobertura Sensor for Python coverage [python]
+INFO: Sensor Cobertura Sensor for Python coverage [python] (done) | time=10ms
+INFO: Sensor PythonXUnitSensor [python]
+INFO: Sensor PythonXUnitSensor [python] (done) | time=1ms
+INFO: Sensor CSS Rules [cssfamily]
+INFO: No CSS, PHP, HTML or VueJS files are found in the project. CSS analysis is skipped.
+INFO: Sensor CSS Rules [cssfamily] (done) | time=0ms
+INFO: Sensor JaCoCo XML Report Importer [jacoco]
+INFO: 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml
+INFO: No report imported, no coverage information will be imported by JaCoCo XML Report Importer
+INFO: Sensor JaCoCo XML Report Importer [jacoco] (done) | time=3ms
+INFO: Sensor C# Project Type Information [csharp]
+INFO: Sensor C# Project Type Information [csharp] (done) | time=0ms
+INFO: Sensor C# Analysis Log [csharp]
+INFO: Sensor C# Analysis Log [csharp] (done) | time=14ms
+INFO: Sensor C# Properties [csharp]
+INFO: Sensor C# Properties [csharp] (done) | time=0ms
+INFO: Sensor JavaXmlSensor [java]
+INFO: Sensor JavaXmlSensor [java] (done) | time=1ms
+INFO: Sensor HTML [web]
+INFO: Sensor HTML [web] (done) | time=3ms
+INFO: Sensor VB.NET Project Type Information [vbnet]
+INFO: Sensor VB.NET Project Type Information [vbnet] (done) | time=1ms
+INFO: Sensor VB.NET Analysis Log [vbnet]
+INFO: Sensor VB.NET Analysis Log [vbnet] (done) | time=14ms
+INFO: Sensor VB.NET Properties [vbnet]
+INFO: Sensor VB.NET Properties [vbnet] (done) | time=0ms
+INFO: ------------- Run sensors on project
+INFO: Sensor Zero Coverage Sensor
+INFO: Sensor Zero Coverage Sensor (done) | time=6ms
+INFO: SCM Publisher SCM provider for this project is: git
+INFO: SCM Publisher 1 source file to be analyzed
+INFO: SCM Publisher 1/1 source file have been analyzed (done) | time=277ms
+INFO: CPD Executor Calculating CPD for 1 file
+INFO: CPD Executor CPD calculation finished (done) | time=6ms
+INFO: Analysis report generated in 81ms, dir size=103.1 kB
+INFO: Analysis report compressed in 14ms, zip size=14.5 kB
+INFO: Analysis report uploaded in 52ms
+INFO: ANALYSIS SUCCESSFUL, you can browse http://51.250.32.100:9000/dashboard?id=Super_proj
+INFO: Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report
+INFO: More about the report processing at http://51.250.32.100:9000/api/ce/task?id=AYLzrdEd_xKxsv1d8cQm
+INFO: Analysis total time: 6.929 s
+INFO: ------------------------------------------------------------------------
+INFO: EXECUTION SUCCESS
+INFO: ------------------------------------------------------------------------
+INFO: Total time: 16.470s
+INFO: Final Memory: 8M/30M
+INFO: ------------------------------------------------------------------------
+dpopov@dpopov-test:~/mnt-homeworks/09-ci-03-cicd$
