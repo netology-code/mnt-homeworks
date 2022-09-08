@@ -14,7 +14,7 @@
 В репозитории содержится код проекта на python. Проект - RESTful API сервис. Ваша задача автоматизировать сборку образа с выполнением python-скрипта:
 1. Образ собирается на основе [centos:7](https://hub.docker.com/_/centos?tab=tags&page=1&ordering=last_updated)
 2. Python версии не ниже 3.7
-3. Установлены зависимости: `flask` `flask-jsonpify` `flask-restful`
+3. Установлены зависимости: `flask` `flask-restful`
 4. Создана директория `/python_api`
 5. Скрипт из репозитория размещён в /python_api
 6. Точка вызова: запуск скрипта
