@@ -128,7 +128,7 @@ git push
 19. В ответ предоставьте ссылку на репозиторий
 
 * Ссылка на репозиторий
-[example-teamcity]()
+[example-teamcity](https://github.com/rowhe/example-teamcity.git)
 ---
 
 ### Как оформить ДЗ?
