@@ -165,8 +165,7 @@ deploy:
 
 После успешного прохождения всех ролей - отправьте ссылку на ваш проект в гитлаб, как решение домашнего задания
 
-* [Ссылка](https://netology-dpopov.gitlab.yandexcloud.net/users/sign_in) на домашнюю работу по GitLab
-
+* [[Ссылка](https://netology-dpopov.gitlab.yandexcloud.net/dpopov/netology-test.git)](https://netology-dpopov.gitlab.yandexcloud.net/dpopov/netology-test.git) на домашнюю работу по GitLab
 
 * ### :bangbang: Не забудьте оставить GitLab рабочим после выполнения задания и погасить все ресурсы в Yandex.Cloud сразу после получения зачета по домашнему заданию.
 
