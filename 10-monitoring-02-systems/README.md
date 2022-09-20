@@ -13,7 +13,7 @@
     - Nagios
 
 3. Склонируйте себе [репозиторий](https://github.com/influxdata/sandbox/tree/master) и запустите TICK-стэк, 
-используя технологии docker и docker-compose.
+используя технологии docker и docker-compose.(по инструкции ./sandbox up )
 
 В виде решения на это упражнение приведите выводы команд с вашего компьютера (виртуальной машины):
 
