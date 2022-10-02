@@ -1,8 +1,11 @@
+# Max virtual memory areas vm.max_map_count must be least 262144
+# sysctl -w vm.max_map_count=262144
+
 version: '2.2'
 services:
 
   es-hot:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+    image: elasticsearch:7.16.2
     container_name: es-hot
     environment:
       - node.name=es-hot
@@ -28,7 +31,7 @@ services:
       - es-warm
 
   es-warm:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+    image: elasticsearch:7.16.2
     container_name: es-warm
     environment:
       - node.name=es-warm
@@ -50,7 +53,7 @@ services:
       - elastic
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.11.0
+    image: kibana:7.16.2
     container_name: kibana
     ports:
       - 5601:5601
@@ -64,13 +67,13 @@ services:
       - es-warm
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:6.3.2
+    image: "docker.elastic.co/logstash/logstash:7.16.2"
     container_name: logstash
     ports:
       - 5046:5046
     volumes:
-      - ./configs/logstash.conf:/etc/logstash/conf.d/logstash.conf:Z
-      - ./configs/logstash.yml:/opt/logstash/config/logstash.yml:Z
+      - ./configs/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:Z
+      - ./configs/logstash.yml:/usr/share/logstash/config/logstash.yml:Z
     networks:
       - elastic
     depends_on:
@@ -78,7 +81,7 @@ services:
       - es-warm
 
   filebeat:
-    image: "docker.elastic.co/beats/filebeat:7.2.0"
+    image: elastic/filebeat:7.16.2
     container_name: filebeat
     privileged: true
     user: root
