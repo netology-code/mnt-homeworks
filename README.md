@@ -50,4 +50,5 @@
 
 
 ## Дополнительные материалы к лекциям
-[Дополнительные материалы](https://github.com/netology-code/mnt-homeworks/tree/MNT-video/08-ansible-additional)
+
+[Дополнительные материалы к лекциям по Ansible](https://github.com/netology-code/mnt-homeworks/tree/MNT-video/08-ansible-additional)
