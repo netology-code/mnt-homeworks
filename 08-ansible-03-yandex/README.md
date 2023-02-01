@@ -2,7 +2,8 @@
 
 ## Подготовка к выполнению
 
-1. Подготовьте в Yandex Cloud три хоста: для `clickhouse`, для `vector` и для `lighthouse`.
+1. (Необязательно) Познакомтесь с [lighthouse](https://youtu.be/ymlrNlaHzIY?t=929)
+2. Подготовьте в Yandex Cloud три хоста: для `clickhouse`, для `vector` и для `lighthouse`.
 
 Ссылка на репозиторий LightHouse: https://github.com/VKCOM/lighthouse
 

@@ -31,8 +31,9 @@
 
 ## Задание 2
 Изучите самостоятельно ресурсы:
-- [promql-for-humans](https://timber.io/blog/promql-for-humans/#cpu-usage-by-instance)
-- [understanding prometheus cpu metrics](https://www.robustperception.io/understanding-machine-cpu-usage)
+- [PromQL query to find CPU and memory](https://stackoverflow.com/questions/62770744/promql-query-to-find-cpu-and-memory-used-for-the-last-week)
+- [PromQL tutorial](https://valyala.medium.com/promql-tutorial-for-beginners-9ab455142085)
+- [Understanding Prometheus CPU metrics](https://www.robustperception.io/understanding-machine-cpu-usage)
 
 Создайте Dashboard и в ней создайте следующие Panels:
 - Утилизация CPU для nodeexporter (в процентах, 100-idle)
