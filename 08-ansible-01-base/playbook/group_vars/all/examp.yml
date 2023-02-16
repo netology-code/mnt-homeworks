@@ -1,2 +1,5 @@
 ---
-  some_fact: 12
+#  some_fact: 12
+  some_fact: all default fact
+
+
