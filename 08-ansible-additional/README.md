@@ -5,3 +5,5 @@
 3. [Скачать Kibana](https://www.elastic.co/downloads/kibana).
 4. [Скачать Filebeat](https://www.elastic.co/downloads/beats/filebeat).
 5. [Все виды beat](https://www.elastic.co/downloads/beats/).
+6. [Что такое ansible?](https://youtu.be/oCmkKrLJE_4)
+7. [Что такое playbook?](https://youtu.be/170tFeEgT94)
