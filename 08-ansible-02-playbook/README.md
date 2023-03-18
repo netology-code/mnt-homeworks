@@ -10,19 +10,29 @@
 ## Основная часть
 
 1. Приготовьте свой собственный inventory файл `prod.yml`
-  - <details><summary>prod.yml</summary>
-    <pre>
-    clickhouse:
+
+ <details>
+  <summary>Example</summary>
+
+  ```
+  ---
+clickhouse:
   hosts:
     clickhouse-01:
       ansible_host: "172.17.0.110"
-    </pre>
-   </details>
-2. Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает [vector](https://vector.dev). 
+  ```
+</details>
+
+2. Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает [vector](https://vector.dev).
+ 
 ![Play_install_deb_pack_vector]  (https://imgur.com/a/gUdVPXT)
+
 ![Play_install_deb_pack_clickhouse](https://i.imgur.com/LyPSTf4.png)
+
 ![Play_deinstall_deb_pack_vector](https://i.imgur.com/mbHQkO7.png)
+
 ![Play_deinstall_deb_pack_clickhouse](https://i.imgur.com/QdtNPxo.png)
+
 3. При создании tasks рекомендую использовать модули: `get_url`, `template`, `unarchive`, `file`.
   - <details><summary>Mods</summary>
     <pre>
@@ -205,19 +215,79 @@ ansible.builtin.systemd
   ```
 </details>
 5. Запустите `ansible-lint site.yml` и исправьте ошибки, если они есть.
+
 ![ansible-lint](https://i.imgur.com/EQQbee9.png)
+
 6. Попробуйте запустить playbook на этом окружении с флагом `--check`.
+
 ![check-kek-chebureg](https://i.imgur.com/vtgI53W.png)
+
 7. Запустите playbook на `prod.yml` окружении с флагом `--diff`. Убедитесь, что изменения на системе произведены.
+
 ![1](https://i.imgur.com/XwDE6A4.png)
+
 ![2](https://i.imgur.com/hAFMIWp.png)
+
 ![3](https://i.imgur.com/nwWK9W4.png)
+
 ![4](https://i.imgur.com/NAGswJQ.png)
+
 8. Повторно запустите playbook с флагом `--diff` и убедитесь, что playbook идемпотентен.
+
 ![1](https://i.imgur.com/ZgY4OQF.png)
+
 ![2](https://i.imgur.com/4ZA5LsP.png)
+
 ![3](https://i.imgur.com/C4kBZTX.png)
+
 9. Подготовьте README.md файл по своему playbook. В нём должно быть описано: что делает playbook, какие у него есть параметры и теги.
+
+playbook/site.yml содержит 2 блока задач:
+
+<details>
+  <summary>Первый</summary>
+
+  ```
+   Блок инсталяции Clickhouse. Тэг - clickhouse. В нем:
+clickhouse_version: "22.3.3.44" - версия Clickhouse
+clickhouse_packages: ["clickhouse-client", "clickhouse-server", "clickhouse-common-static"] - список пакетов для установки
+Task'и:
+TASK [Clickhouse. Get clickhouse distrib] - скачивает deb-пакеты с дистрибутивами с помощью модуля ansible.builtin.get_url
+TASK [Clickhouse. Install package clickhouse-common-static] - устанавливает deb-пакет с помощью модуля ansible.builtin.apt
+TASK [Clickhouse. Install package clickhouse-client] - устанавливает deb-пакет с помощью модуля ansible.builtin.apt
+TASK [Clickhouse. Install clickhouse package clickhouse-server] - устанавливает deb-пакеты с помощью модуля ansible.builtin.apt
+TASK [Clickhouse. Flush handlers] - инициирует внеочередной запуск хандлера Start clickhouse service
+RUNNING HANDLER [Start clickhouse service] - для старта сервера clickhouse в хандлере используется модуль ansible.builtin.service
+TASK [Clickhouse. Waiting while clickhouse-server is available...] - устанавливает паузу в 10 секунд с помощью модуля ansible.builtin.pause, чтобы сервер Clickhouse успел запуститься. Иначе следующая задача по созданию БД может завершиться ошибкой, т.к. сервер еще не успел подняться
+TASK [Clickhouse. Create database] - создает инстанс базы данных Clickhouse
+  ```
+</details>
+
+<details>
+  <summary>Второй</summary>
+
+  ```
+ Блок инсталяции Vector. Тэг - vector. Используются параметры:
+vector_version: "0.21.1" - версия Vector
+vector_os_arh: "x86_64" - архитектура ОС
+vector_workdir: "/home/vector" - рабочий каталог, в котором будут сохранены скачанные deb-пакеты
+vector_os_user: "vector" - имя пользователя-владельца Vector в ОС
+vector_os_group: "vector" - имя группы пользователя-владельца Vector в ОС
+Task'и:
+TASK [Vector. Create work directory] - создает рабочий каталог, в котором будут сохранены скачанные deb-пакеты, с помощью модуля ansible.builtin.file
+TASK [Vector. Get Vector distributive] - скачивает архив с дистрибутивом с помощью модуля ansible.builtin.get_url
+TASK [Vector. Unzip archive] - распаковывает скачанный архив с помощью модуля ansible.builtin.unarchive
+TASK [Vector. Install vector binary file] - копирует исполняемый файл Vector в /usr/bin с помощью модуля ansible.builtin.copy
+TASK [Vector. Check Vector installation] - проверяет, что бинарный файл Vector работает корректно, с помощью модуля ansible.builtin.command
+TASK [Vector. Create Vector config vector.toml] - создает файл /etc/vector/vector.toml с конфигом Vector с помощью модуля ansible.builtin.copy
+TASK [Vector. Create vector.service daemon] - создает файл юнита systemd /lib/systemd/system/vector.service с помощью модуля ansible.builtin.copy
+TASK [Vector. Modify vector.service file] - редактирует файл юнита systemd /lib/systemd/system/vector.service с помощью модуля ansible.builtin.replace
+TASK [Vector. Create user vector] - создает пользователя ОС с помощью модуля ansible.builtin.user
+TASK [Vector. Create data_dir] - создает каталог дял данных Vector с помощью модуля ansible.builtin.file
+TASK [Vector. Remove work directory] - удаляет рабочий каталог с помощью модуля ansible.builtin.file
+RUNNING HANDLER [Start Vector service] - инициируется запуск хандлера Start Vector service, обновляющего конфигурацию systemd и стартующего сервис vector.service с помощью модуляansible.builtin.systemd
+  ```
+</details>
 
 10. Готовый playbook выложите в свой репозиторий, поставьте тег `08-ansible-02-playbook` на фиксирующий коммит, в ответ предоставьте ссылку на него.
 
