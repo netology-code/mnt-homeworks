@@ -12,15 +12,14 @@
 1. Приготовьте свой собственный inventory файл `prod.yml`
   - <details><summary>prod.yml</summary>
     <pre>
-    ---
-clickhouse:
+    clickhouse:
   hosts:
     clickhouse-01:
       ansible_host: "172.17.0.110"
     </pre>
    </details>
 2. Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает [vector](https://vector.dev). 
-![Play_install_deb_pack_vector](https://imgur.com/a/gUdVPXT)
+![Play_install_deb_pack_vector]  (https://imgur.com/a/gUdVPXT)
 ![Play_install_deb_pack_clickhouse](https://i.imgur.com/LyPSTf4.png)
 ![Play_deinstall_deb_pack_vector](https://i.imgur.com/mbHQkO7.png)
 ![Play_deinstall_deb_pack_clickhouse](https://i.imgur.com/QdtNPxo.png)
