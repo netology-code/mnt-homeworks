@@ -4,3 +4,9 @@ clickhouse_packages:
   - clickhouse-client
   - clickhouse-server
   - clickhouse-common-static
+
+vector_version: "0.21.1"
+vector_os_arh: "x86_64"
+vector_workdir: "/home/vector"
+vector_os_user: "vector"
+vector_os_group: "vector"
