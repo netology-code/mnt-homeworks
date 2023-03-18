@@ -12,7 +12,7 @@
 1. Приготовьте свой собственный inventory файл `prod.yml`
 
  <details>
-  <summary>Example</summary>
+  <summary> [prod.yml](https://github.com/NamorNinayzuk/mnt-homeworks/blob/MNT-video/08-ansible-02-playbook/playbook/inventory/prod.yml "жмакай") </summary>
 
   ```
   ---
@@ -25,7 +25,7 @@ clickhouse:
 
 2. Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает [vector](https://vector.dev).
  
-![Play_install_deb_pack_vector]  (https://imgur.com/a/gUdVPXT)
+![Play_install_deb_pack_vector](https://imgur.com/a/gUdVPXT)
 
 ![Play_install_deb_pack_clickhouse](https://i.imgur.com/LyPSTf4.png)
 
@@ -52,7 +52,7 @@ ansible.builtin.systemd
    </details>
 4. Tasks должны: скачать нужной версии дистрибутив, выполнить распаковку в выбранную директорию, установить vector.
 <details>
-  <summary>All in site.yml</summary>
+  <summary>All in  [site.yml](https://github.com/NamorNinayzuk/mnt-homeworks/blob/MNT-video/08-ansible-02-playbook/playbook/site.yml "жмакай")  </summary>
 
   ```
   ---
@@ -242,7 +242,7 @@ ansible.builtin.systemd
 
 9. Подготовьте README.md файл по своему playbook. В нём должно быть описано: что делает playbook, какие у него есть параметры и теги.
 
-playbook/site.yml содержит 2 блока задач:
+[playbook/site.yml](https://github.com/NamorNinayzuk/mnt-homeworks/blob/MNT-video/08-ansible-02-playbook/playbook/site.yml "жмакай") содержит 2 блока задач:
 
 <details>
   <summary>Первый</summary>
@@ -291,6 +291,7 @@ RUNNING HANDLER [Start Vector service] - инициируется запуск �
 
 10. Готовый playbook выложите в свой репозиторий, поставьте тег `08-ansible-02-playbook` на фиксирующий коммит, в ответ предоставьте ссылку на него.
 
+[playbook](https://github.com/NamorNinayzuk/mnt-homeworks/tree/MNT-video/08-ansible-02-playbook/playbook "жмакай")
 ---
 
 ### Как оформить ДЗ?
