@@ -2,4 +2,4 @@
 clickhouse:
   hosts:
     clickhouse-01:
-      ansible_host: <IP_here>
+      ansible_host: "172.17.0.110"
