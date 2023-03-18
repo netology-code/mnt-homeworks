@@ -9,10 +9,10 @@
 
 ## Основная часть
 
-1. Приготовьте свой собственный inventory файл `prod.yml`
+1. Приготовьте свой собственный inventory файл  [prod.yml](https://github.com/NamorNinayzuk/mnt-homeworks/blob/MNT-video/08-ansible-02-playbook/playbook/inventory/prod.yml "жмакай")
 
  <details>
-  <summary> [prod.yml](https://github.com/NamorNinayzuk/mnt-homeworks/blob/MNT-video/08-ansible-02-playbook/playbook/inventory/prod.yml "жмакай") </summary>
+  <summary> `prod.yml`  </summary>
 
   ```
   ---
@@ -52,7 +52,7 @@ ansible.builtin.systemd
    </details>
 4. Tasks должны: скачать нужной версии дистрибутив, выполнить распаковку в выбранную директорию, установить vector.
 <details>
-  <summary>All in  [site.yml](https://github.com/NamorNinayzuk/mnt-homeworks/blob/MNT-video/08-ansible-02-playbook/playbook/site.yml "жмакай")  </summary>
+  <summary>All in `site.yml` </summary>
 
   ```
   ---
