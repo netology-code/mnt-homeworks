@@ -25,6 +25,8 @@ clickhouse:
 
 2. Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает [vector](https://vector.dev).
 
+
+
 ![Play_install_deb_pack_clickhouse](https://imgur.com/a/gUdVPXT)
 
 ![Play_install_deb_pack_clickhouse](https://i.imgur.com/LyPSTf4.png)
