@@ -7,3 +7,4 @@
 5. [Все виды beat](https://www.elastic.co/downloads/beats/).
 6. [Что такое ansible?](https://youtu.be/oCmkKrLJE_4)
 7. [Что такое playbook?](https://youtu.be/170tFeEgT94)
+8. [Как написать playbook?](https://www.youtube.com/watch?v=tL76CB1bnPE)
