@@ -3,7 +3,7 @@
 1. Подготовьте в Yandex Cloud три хоста: для `clickhouse`, для `vector` и для `lighthouse`.
 
 
-![Yandex Cloud](https://imgur.com/a/ZI47mGz)
+![Yandex Cloud]([https://imgur.com/a/ZI47mGz](https://i.imgur.com/YDbMeOd.png))
 Ссылка на репозиторий LightHouse: https://github.com/VKCOM/lighthouse
 
 ## Основная часть
