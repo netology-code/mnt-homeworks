@@ -33,17 +33,29 @@ clickhouse:
 
 3. При создании tasks рекомендую использовать модули: `get_url`, `template`, `unarchive`, `file`.
   - Mods
+ 
 `ansible.builtin.get_url`
+
 `ansible.builtin.apt`
+
 `ansible.builtin.meta`
+
 `ansible.builtin.pause`
+
 `ansible.builtin.command`
+
 `ansible.builtin.file`
+
 `ansible.builtin.unarchive`
+
 `ansible.builtin.copy`
+
 `ansible.builtin.replace`
+
 `ansible.builtin.user`
+
 `ansible.builtin.service`
+
 `ansible.builtin.systemd`
    
 4. Tasks должны: скачать нужной версии дистрибутив, выполнить распаковку в выбранную директорию, установить vector.
