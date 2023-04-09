@@ -20,8 +20,42 @@
    ```
 
 2. При помощи `ansible-galaxy` скачать себе эту роль.
+
+Загрузка ролей выполняется командой: `ansible-galaxy install -r <файл>`, где `<файл>` - YAML файл с информацией о требуемых компонентах (ролях), включая информацию о способе их получения.
+
+Если используемая роль уже загружена или её нужно обновить, то необходимо добавить ключ `--force`
+```console
+┌──(kali㉿kali)-[~/devops-netology8.4]
+└─$ ansible-galaxy install -r requirements.yml                                       
+Starting galaxy role install process
+- extracting clickhouse to /home/kali/.ansible/roles/clickhouse
+- clickhouse (1.11.0) was installed successfully
+┌──(kali㉿kali)-[~/devops-netology8.4]
+└─$ 
+```
 3. Создать новый каталог с ролью при помощи `ansible-galaxy role init vector-role`.
-4. На основе tasks из старого playbook заполните новую role. Разнесите переменные между `vars` и `default`. 
+
+Для упрощения подготовки роли можно воспользоваться командой `ansible-galaxy role init <роль>`, где `<роль>` - имя инициализируемой роли.
+Данная команда создаст шаблон новой роли, а именно - набор каталогов и предзаполненных файлов внутри директории `<роль>`.
+
+Пример вывода команды:
+```console
+┌──(kali㉿kali)-[~/devops-netology8.4]
+└─$ ansible-galaxy role init vector-role
+- Role vector-role was created successfully                                                                                                                                                                                                                                        
+┌──(kali㉿kali)-[~/devops-netology8.4]
+└─$ ansible-galaxy role init lighthouse-role
+- Role lighthouse-role was created successfully
+
+```
+
+4. На основе tasks из старого playbook заполните новую role. Разнесите переменные между `vars` и `default`.
+
+В структуре каталогов роли переменные делятся на две группы: `defaults` и `vars`.
+В **defaults** хранятся переменные и их значения по умолчанию, которые пользователь может переопределить на любом уровне (**group vars**, **host vars** и т.п.)
+В **vars** хранятся переменные и их значения, которые обычно не предназначены для переопределения пользователем, а используются для упрощения дальнейшей разработки роли.
+Исключение [--extra-vars](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html), которые при передаче в командной строке `ansible-playbook` могут их переопределить.
+
 5. Перенести нужные шаблоны конфигов в `templates`.
 6. Описать в `README.md` обе роли и их параметры.
 7. Повторите шаги 3-6 для lighthouse. Помните, что одна роль должна настраивать один продукт.
