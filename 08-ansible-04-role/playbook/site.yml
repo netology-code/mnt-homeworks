@@ -1,0 +1,22 @@
+---
+- name: Install Clickhouse
+  hosts: clickhouse
+  roles:
+    - clickhouse
+
+- name: Install Vector
+  hosts: vector
+  roles:
+    - vector-role
+
+- name: Install Lighthouse
+  hosts: lighthouse
+  pre_tasks:
+    - name: install unzip
+      become: true
+      ansible.builtin.apt:
+        name: unzip
+        state: present
+        update_cache: yes
+  roles:
+    - lighthouse-role
