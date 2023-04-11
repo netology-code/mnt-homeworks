@@ -107,6 +107,16 @@ Starting galaxy role install process
 
 Нет зависимостей
 
+Пример плейбука с использованием роли
+----------------
+Пример для использования на машинах на которых уже установлена утилита Unzip:
+```
+- name: Install Lighthouse
+  hosts: lighthouse
+  roles:
+    - lighthouse-role
+```
+
 Пример с установкой утилиты Unzip в рамках pre_tasks в плее использующем данную роль:
 
 ```yaml
