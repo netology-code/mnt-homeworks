@@ -78,7 +78,7 @@ Starting galaxy role install process
 Переменные роли
 --------------
 
-В [переменных по умолчанию](./defaults/main.yml) указана версию ПО Vector 0.25.0, в случае необходимости её нужно изменить.
+В [переменных по умолчанию](https://github.com/NamorNinayzuk/vector-role/blob/main/defaults/main.yml) указана версию ПО Vector 0.25.0, в случае необходимости её нужно изменить.
 
 Зависимости
 ------------
@@ -99,8 +99,8 @@ Starting galaxy role install process
 Переменные роли
 --------------
 
-В [переменных по умолчанию](./defaults/main.yml) указана версия ПО Nginx 1.18.0, в случае необходимости её нужно изменить.  
-В [изменяемых переменных](./defaults/main.yml) указан порт по которому будет слушать ПО Lighthouse. По умолчанию это порт 80, в случае необходимости его можно изменить.
+В [переменных по умолчанию](https://github.com/NamorNinayzuk/lighthouse-role/blob/main/defaults/main.yml) указана версия ПО Nginx 1.18.0, в случае необходимости её нужно изменить.  
+В [изменяемых переменных](https://github.com/NamorNinayzuk/lighthouse-role/blob/main/vars/main.yml) указан порт по которому будет слушать ПО Lighthouse. По умолчанию это порт 80, в случае необходимости его можно изменить.
 
 Зависимости
 ------------
