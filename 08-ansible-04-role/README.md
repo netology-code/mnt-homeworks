@@ -107,6 +107,21 @@ Starting galaxy role install process
 
 Нет зависимостей
 
+Пример с установкой утилиты Unzip в рамках pre_tasks в плее использующем данную роль:
+
+```yaml
+- name: Install Lighthouse
+  hosts: lighthouse
+  pre_tasks:
+    - name: install unzip
+      become: true
+      ansible.builtin.apt:
+        name: unzip
+        state: present
+        update_cache: yes
+  roles:
+    - lighthouse-role
+```
 ---
 
 ### Как оформить ДЗ?
