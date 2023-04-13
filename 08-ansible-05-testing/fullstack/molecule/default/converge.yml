@@ -60,8 +60,8 @@
       default:
         date_time_input_format: best_effort
     clickhouse_users_custom:
-      - { name: "logger",
-          password: "logger",
+      - { name: "user",
+          password: "userlog",
           profile: "default",
           quota: "default",
           networks: { '::/0' },
@@ -94,15 +94,15 @@
   roles:
     - vector-role
   vars:
-    clickhouse_user: "logger"
-    clickhouse_password: "logger"
+    clickhouse_user: "user"
+    clickhouse_password: "userlog"
 
 - name: Install Lighthouse
   hosts: lighthouse
   roles:
     - lighthouse-role
   vars:
-    clickhouse_user: "logger"
-    clickhouse_password: "logger"
+    clickhouse_user: "user"
+    clickhouse_password: "userlog"
     lighthouse_port: "8080"
 ...
