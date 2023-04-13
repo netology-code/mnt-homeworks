@@ -1,0 +1,108 @@
+---
+- name: Prepare containers
+  hosts: all
+  vars:
+    script_v3: false
+  tasks:
+    - name: Detect python3 version
+      ansible.builtin.command: "python3 --version"
+      register: cmd_res
+      changed_when: false
+      failed_when: false
+    - name: Set python version of script to 3
+      ansible.builtin.set_fact:
+        script_v3: true
+      when: cmd_res.rc == 0
+    - name: Download SystemD replacer v3
+      become: true
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/master/files/docker/systemctl3.py
+        dest: /systemctl.py
+        mode: "a+x"
+      when: script_v3 == true
+    - name: Download SystemD replacer v2
+      become: true
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/master/files/docker/systemctl.py
+        dest: /systemctl.py
+        mode: "a+x"
+      when: script_v3 == false
+    - name: Create systemd directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        recurse: true
+      loop:
+        - /run/systemd/system
+        - /usr/lib/systemd/system
+    - name: Replace systemctl
+      become: true
+      ansible.builtin.copy:
+        src: /systemctl.py
+        remote_src: true
+        dest: /usr/bin/systemctl
+        mode: "+x"
+        force: true
+    #- name: ReCollect system info
+    #  ansible.builtin.setup:
+
+- name: Install Clickhouse
+  hosts: clickhouse
+  roles:
+    - clickhouse-role
+  vars:
+    clickhouse_version: "22.3.3.44"
+    clickhouse_listen_host:
+      - "0.0.0.0"
+    clickhouse_dbs_custom:
+      - { name: "logs" }
+    clickhouse_profiles_default:
+      default:
+        date_time_input_format: best_effort
+    clickhouse_users_custom:
+      - { name: "logger",
+          password: "logger",
+          profile: "default",
+          quota: "default",
+          networks: { '::/0' },
+          dbs: ["logs"],
+          access_management: 0 }
+    file_log_structure: "file String, host String, message String, timestamp DateTime64"
+  post_tasks:
+    - name: Create tables
+      ansible.builtin.command: "clickhouse-client --host 127.0.0.1 -q 'CREATE TABLE logs.file_log ({{ file_log_structure }}) ENGINE = Log();'"
+      register: create_tbl
+      failed_when: create_tbl.rc != 0 and create_tbl.rc != 57
+      changed_when: create_tbl.rc == 0
+
+- name: Detect Clickhouse IP
+  hosts: vector, lighthouse
+  tasks:
+    - name: Get Clickhouse IP from docker engine
+      ansible.builtin.command: "docker inspect -f {{'{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}'}} clickhouse"
+      register: cmd_res
+      changed_when: false
+      failed_when: cmd_res.rc != 0
+      delegate_to: localhost
+    - name: Set Clickhouse IP to facts
+      ansible.builtin.set_fact:
+        clickhouse_host: "{{ cmd_res.stdout }}"
+      when: cmd_res.rc == 0
+
+- name: Install Vector
+  hosts: vector
+  roles:
+    - vector-role
+  vars:
+    clickhouse_user: "logger"
+    clickhouse_password: "logger"
+
+- name: Install Lighthouse
+  hosts: lighthouse
+  roles:
+    - lighthouse-role
+  vars:
+    clickhouse_user: "logger"
+    clickhouse_password: "logger"
+    lighthouse_port: "8080"
+...
