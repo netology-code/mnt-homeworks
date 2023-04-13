@@ -1,0 +1,89 @@
+---
+- name: Verify vector installation
+  hosts: vector
+  gather_facts: false
+  tasks:
+    - name: Get information about vector
+      ansible.builtin.command: systemctl show vector
+      register: srv_res
+      changed_when: false
+    - name: Assert vector service
+      ansible.builtin.assert:
+        that:
+          - srv_res.rc == 0
+          - "'ActiveState=active' in srv_res.stdout_lines"
+          - "'LoadState=loaded' in srv_res.stdout_lines"
+          - "'SubState=running' in srv_res.stdout_lines"
+    - name: Validate vector configuration
+      ansible.builtin.command: vector validate
+      register: vld_res
+      changed_when: false
+    - name: Assert vector healthcheck
+      ansible.builtin.assert:
+        that:
+          - vld_res.rc == 0
+          - "'Validated' == {{ vld_res.stdout_lines | map('trim') | list }}[-1]"
+
+- name: Verify lighthouse installation
+  hosts: lighthouse
+  gather_facts: false
+  tasks:
+    - name: Get information about nginx
+      ansible.builtin.command: systemctl show nginx
+      register: srv_res
+      changed_when: false
+    - name: Assert nginx service
+      ansible.builtin.assert:
+        that:
+          - srv_res.rc == 0
+          - "'ActiveState=active' in srv_res.stdout_lines"
+          - "'LoadState=loaded' in srv_res.stdout_lines"
+          - "'SubState=running' in srv_res.stdout_lines"
+    - name: Save server home page
+      ansible.builtin.get_url:
+        url: "http://127.0.0.1:8080"
+        dest: "~/index.html"
+        mode: "0644"
+    - name: Get home page
+      ansible.builtin.command: cat ~/index.html
+      register: fil_res
+      changed_when: false
+    - name: Assert lighthouse homepage
+      ansible.builtin.assert:
+        that:
+          - fil_res.rc == 0
+          - fil_res.stdout.find('<title>LightHouse</title>') != -1
+
+- name: Store data to vector
+  hosts: vector
+  gather_facts: false
+  tasks:
+    - name: Create files
+      ansible.builtin.command: "touch {{ item }} && sync"
+      loop:
+        - "~/test/one.log"
+        - "~/test/two.log"
+    - name: Write some data to file
+      ansible.builtin.shell: echo {{ item }} >> ~/test/one.log && sync
+      become: true
+      loop:
+        - "First line"
+        - "Second line"
+        - "Third line"
+    - name: Write some data to another file
+      ansible.builtin.shell: echo {{ item }} >> ~/test/two.log && sync
+      become: true
+      loop:
+        - "A little bit of data"
+        - "Some amount of data"
+        - "More data"
+
+- name: Check Clickhouse data
+  hosts: clickhouse
+  gather_facts: false
+  vars:
+    retry_count: 5
+    retry_delay: 1
+  tasks:
+    - include_tasks: verify_clickhouse.yml
+...
