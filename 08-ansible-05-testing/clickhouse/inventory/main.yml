@@ -1,0 +1,7 @@
+---
+clickhouse:
+  hosts:
+    clickhouse:
+      ansible_host: "clickhouse"
+      ansible_connection: docker
+...
