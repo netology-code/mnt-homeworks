@@ -1,0 +1,45 @@
+---
+- name: Repeatable check
+  block:
+  - name: Decrease attempts count
+    set_fact:
+      retry_count: "{{ retry_count | int - 1 }}"
+  - name: Get clickhouse response
+    ansible.builtin.uri:
+      url: http://127.0.0.1:8123/?user=logger&password=logger&add_http_cors_header=1&output_format_json_quote_64bit_integers=1&database=logs&result_overflow_mode=throw&readonly=1
+      method: "POST"
+      body_format: "raw"
+      body: "SELECT file, message FROM logs.file_log LIMIT 6 FORMAT Values"
+      return_content: true
+    register: res
+  - name: Compose acquired data to list
+    ansible.builtin.set_fact:
+      data_raw: '{{ res.content[1:-1] | split("),(") }}'
+  - name: Print acquired data
+    debug:
+      var: data_raw
+  - name: Verify acquired data
+    ansible.builtin.assert:
+      that:
+        - data_raw | length == 6
+        - data_raw ==
+          [
+            "'/root/test/one.log','First line'",
+            "'/root/test/one.log','Second line'",
+            "'/root/test/one.log','Third line'",
+            "'/root/test/two.log','A little bit of data'",
+            "'/root/test/two.log','Some amount of data'",
+            "'/root/test/two.log','More data'"
+          ]
+  rescue:
+    - name: Fail if retry count is zero
+      ansible.builtin.fail:
+        msg: "No more attempts left"
+      when: retry_count | int == 0
+    - name: Try another attempt after delay
+      ansible.builtin.wait_for:
+        timeout: "{{ retry_delay }}" # seconds
+      delegate_to: localhost
+      become: false
+    - include_tasks: verify_clickhouse.yml
+...
