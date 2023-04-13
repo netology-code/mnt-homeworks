@@ -1,0 +1,13 @@
+---
+version: "2.4"
+
+services:
+  clickhouse_vm:
+    image: pycontribs/centos:7
+    container_name: clickhouse
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+    tty: true
+    network_mode: bridge
+...
