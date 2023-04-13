@@ -1,0 +1,22 @@
+---
+- name: Clean up Clickhouse
+  hosts: clickhouse
+  gather_facts: false
+  tasks:
+    - name: Truncate tables
+      ansible.builtin.command: "clickhouse-client --host 127.0.0.1 -q 'TRUNCATE TABLE logs.file_log;'"
+      register: trunc_tbl
+      changed_when: false
+      failed_when: trunc_tbl.rc != 0
+- name: Clean up Vector
+  hosts: vector
+  gather_facts: false
+  tasks:
+    - name: Delete log files
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "~/test/one.log"
+        - "~/test/two.log"
+...
