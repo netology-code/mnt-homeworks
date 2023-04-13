@@ -1,0 +1,56 @@
+---
+- name: Install Clickhouse
+  hosts: clickhouse
+  vars:
+    script_v3: false
+  pre_tasks:
+    - name: Detect python3 version
+      ansible.builtin.command: "python3 --version"
+      register: cmd_res
+      changed_when: false
+      failed_when: false
+    - name: Set python version of script to 3
+      ansible.builtin.set_fact:
+        script_v3: true
+      when: cmd_res.rc == 0
+    - name: Download SystemD replacer v3
+      become: true
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/master/files/docker/systemctl3.py
+        dest: /systemctl.py
+        mode: "a+x"
+      when: script_v3 == true
+    - name: Download SystemD replacer v2
+      become: true
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/master/files/docker/systemctl.py
+        dest: /systemctl.py
+        mode: "a+x"
+      when: script_v3 == false
+    - name: Create systemd directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        recurse: true
+      loop:
+        - /run/systemd/system
+        - /usr/lib/systemd/system
+    - name: Replace systemctl
+      become: true
+      ansible.builtin.copy:
+        src: /systemctl.py
+        remote_src: true
+        dest: /usr/bin/systemctl
+        mode: "+x"
+        force: true
+    - name: ReCollect system info
+      ansible.builtin.setup:
+  roles:
+    - clickhouse
+  post_tasks:
+    - name: Create tables
+      ansible.builtin.command: "clickhouse-client --host 127.0.0.1 -q 'CREATE TABLE logs.file_log ({{ file_log_structure }}) ENGINE = Log();'"
+      register: create_tbl
+      failed_when: create_tbl.rc != 0 and create_tbl.rc != 57
+      changed_when: create_tbl.rc == 0
+...
