@@ -2,7 +2,7 @@ version: '2.2'
 services:
 
   es-hot:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+    image: elasticsearch:7.11.0
     container_name: es-hot
     environment:
       - node.name=es-hot
@@ -28,7 +28,7 @@ services:
       - es-warm
 
   es-warm:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+    image: elasticsearch:7.11.0
     container_name: es-warm
     environment:
       - node.name=es-warm
