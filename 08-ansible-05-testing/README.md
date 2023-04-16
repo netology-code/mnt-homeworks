@@ -2300,20 +2300,1419 @@ root@ubuntu:~/ansible-clickhouse$
 ---
 
 
+### 2. Перейдите в каталог с ролью **vector-role** и создайте сценарий тестирования по умолчанию при помощи `molecule init scenario --driver-name docker`.
 
+> Сценарий по умолчанию - **default**
+```console
+root@ubuntu:~/vector-role$ molecule init scenario --driver-name docker
+INFO     Initializing new scenario default...
+INFO     Initialized scenario in /home/vector-role/molecule/default successfully.
+root@ubuntu:~/vector-role$
+```
 
+---
 
-### Tox
+### 3. Добавьте несколько разных дистрибутивов (centos:8, ubuntu:latest) для инстансов и протестируйте роль, исправьте найденные ошибки, если они есть.
 
-1. Добавьте в директорию с vector-role файлы из [директории](./example)
-2. Запустите `docker run --privileged=True -v <path_to_repo>:/opt/vector-role -w /opt/vector-role -it aragast/netology:latest /bin/bash`, где path_to_repo - путь до корня репозитория с vector-role на вашей файловой системе.
-3. Внутри контейнера выполните команду `tox`, посмотрите на вывод.
-5. Создайте облегчённый сценарий для `molecule` с драйвером `molecule_podman`. Проверьте его на исполнимость.
-6. Пропишите правильную команду в `tox.ini` для того чтобы запускался облегчённый сценарий.
-8. Запустите команду `tox`. Убедитесь, что всё отработало успешно.
-9. Добавьте новый тег на коммит с рабочим сценарием в соответствии с семантическим версионированием.
+Для работы в **Docker** были использованы готовые образы за авторством [pycontribs](https://hub.docker.com/u/pycontribs):
+  - [CentOS](https://hub.docker.com/r/pycontribs/centos/tags) (доступные теги: `7`, `8`) - `docker.io/pycontribs/centos`
+  - [Ubuntu](https://hub.docker.com/r/pycontribs/ubuntu/tags) (доступен только тег `latest`) - `docker.io/pycontribs/ubuntu`
 
-После выполнения у вас должно получится два сценария molecule и один tox.ini файл в репозитории. Не забудьте указать в ответе теги решений Tox и Molecule заданий. В качестве решения пришлите ссылку на  ваш репозиторий и скриншоты этапов выполнения задания. 
+Итоговый файл настройки **molecule**
+
+```yaml
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+  options:
+    D: true
+    vv: true
+platforms:
+  - name: centos7
+    image: docker.io/pycontribs/centos:7
+    pre_build_image: true
+  - name: centos8
+    image: docker.io/pycontribs/centos:8
+    pre_build_image: true
+  - name: ubuntu
+    image: docker.io/pycontribs/ubuntu:latest
+    pre_build_image: true
+provisioner:
+  name: ansible
+  options:
+    D: true
+    vv: true
+  playbooks:
+    converge: ../resources/converge.yml
+    verify: ../resources/verify.yml
+verifier:
+  name: ansible
+...
+```
+
+---
+
+### 4. Добавьте несколько assert'ов в verify.yml файл для проверки работоспособности vector-role (проверка, что конфиг валидный, проверка успешности запуска, etc). Запустите тестирование роли повторно и проверьте, что оно прошло успешно.
+
+Готовый **playbook** проверок:
+
+```yaml
+---
+- name: Verify vector installation
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: Get information about vector
+    ansible.builtin.command: systemctl show vector
+    register: srv_res
+    changed_when: false
+  - name: Assert vector service
+    ansible.builtin.assert:
+      that:
+        - srv_res.rc == 0
+        - "'ActiveState=active' in srv_res.stdout_lines"
+        - "'LoadState=loaded' in srv_res.stdout_lines"
+        - "'SubState=running' in srv_res.stdout_lines"
+  - name: Validate vector configuration
+    ansible.builtin.command: vector validate
+    register: vld_res
+    changed_when: false
+  - name: Assert vector healthcheck
+    ansible.builtin.assert:
+      that:
+        - vld_res.rc == 0
+        - "'Validated' == {{ vld_res.stdout_lines | map('trim') | list }}[-1]"
+...
+```
+
+В проверках определяется текущий статус сервиса **vector** - загружен, активен (автозапуск) и запущен.
+Далее выполняется верификация конфигурационного файла и самоконтроль **Vector**.
+
+По хорошему статус служб лучше проверять специальным модулем `ansible.builtin.service_facts` например так:
+```yaml
+    - name: 'Gather Local Services'
+      ansible.builtin.service_facts:
+      become: true
+    - name: 'Assert Vector Service'
+      ansible.builtin.assert:
+        that:
+          - "'{{ service_name }}' in ansible_facts.services"
+          - "'running' == ansible_facts.services[service_name].state"
+          - "'enabled' == ansible_facts.services[service_name].status"
+```
+> Переменная `service_name` должна содержать имя проверяемого сервиса
+Но, к сожалению, а данной работе это не применить, так как модуль **service_facts** не может определить установленный через скрипт сервис **vector**
+
+<details>
+<summary>:exclamation: Полный лог тестирования роли с использованием <b>Molecule</b>... Лог длинный :bangbang:</summary>
+
+```console
+root@ubuntu:~/vector-role$ molecule test
+INFO     default scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
+INFO     Performing prerun with role_name_check=0...
+INFO     Set ANSIBLE_LIBRARY=/home/.cache/ansible-compat/f5bcd7/modules:/home/.ansible/plugins/modules:/usr/share/ansible/plugins/modules
+INFO     Set ANSIBLE_COLLECTIONS_PATH=/home/.cache/ansible-compat/f5bcd7/collections:/home/.ansible/collections:/usr/share/ansible/collections
+INFO     Set ANSIBLE_ROLES_PATH=/home/.cache/ansible-compat/f5bcd7/roles:/home/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles
+INFO     Using /home/.cache/ansible-compat/f5bcd7/roles/artem_shtepa.vector_role symlink to current repository in order to enable Ansible to find the role using its expected full name.
+INFO     Running default > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running default > lint
+INFO     Lint is disabled.
+INFO     Running default > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running default > destroy
+INFO     Sanity checks: 'docker'
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item=centos7)
+changed: [localhost] => (item=centos8)
+changed: [localhost] => (item=ubuntu)
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+ok: [localhost] => (item=centos7)
+ok: [localhost] => (item=centos8)
+ok: [localhost] => (item=ubuntu)
+
+TASK [Delete docker networks(s)] ***********************************************
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Running default > syntax
+
+playbook: /home/vector-role/molecule/resources/converge.yml
+INFO     Running default > create
+
+PLAY [Create] ******************************************************************
+
+TASK [Log into a Docker registry] **********************************************
+skipping: [localhost] => (item=None)
+skipping: [localhost] => (item=None)
+skipping: [localhost] => (item=None)
+skipping: [localhost]
+
+TASK [Check presence of custom Dockerfiles] ************************************
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True})
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'centos8', 'pre_build_image': True})
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/ubuntu:latest', 'name': 'ubuntu', 'pre_build_image': True})
+
+TASK [Create Dockerfiles from image names] *************************************
+skipping: [localhost] => (item={'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True})
+skipping: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'centos8', 'pre_build_image': True})
+skipping: [localhost] => (item={'image': 'docker.io/pycontribs/ubuntu:latest', 'name': 'ubuntu', 'pre_build_image': True})
+
+TASK [Discover local Docker images] ********************************************
+ok: [localhost] => (item={'changed': False, 'skipped': True, 'skip_reason': 'Conditional result was False', 'item': {'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True}, 'ansible_loop_var': 'item', 'i': 0, 'ansible_index_var': 'i'})
+ok: [localhost] => (item={'changed': False, 'skipped': True, 'skip_reason': 'Conditional result was False', 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'centos8', 'pre_build_image': True}, 'ansible_loop_var': 'item', 'i': 1, 'ansible_index_var': 'i'})
+ok: [localhost] => (item={'changed': False, 'skipped': True, 'skip_reason': 'Conditional result was False', 'item': {'image': 'docker.io/pycontribs/ubuntu:latest', 'name': 'ubuntu', 'pre_build_image': True}, 'ansible_loop_var': 'item', 'i': 2, 'ansible_index_var': 'i'})
+
+TASK [Build an Ansible compatible image (new)] *********************************
+skipping: [localhost] => (item=molecule_local/docker.io/pycontribs/centos:7)
+skipping: [localhost] => (item=molecule_local/docker.io/pycontribs/centos:8)
+skipping: [localhost] => (item=molecule_local/docker.io/pycontribs/ubuntu:latest)
+
+TASK [Create docker network(s)] ************************************************
+
+TASK [Determine the CMD directives] ********************************************
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True})
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'centos8', 'pre_build_image': True})
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/ubuntu:latest', 'name': 'ubuntu', 'pre_build_image': True})
+
+TASK [Create molecule instance(s)] *********************************************
+changed: [localhost] => (item=centos7)
+changed: [localhost] => (item=centos8)
+changed: [localhost] => (item=ubuntu)
+
+TASK [Wait for instance(s) creation to complete] *******************************
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '694370910668.38264', 'results_file': '/home/.ansible_async/694370910668.38264', 'changed': True, 'item': {'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (300 retries left).
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '505681089154.38290', 'results_file': '/home/.ansible_async/505681089154.38290', 'changed': True, 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'centos8', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '681996805273.38323', 'results_file': '/home/.ansible_async/681996805273.38323', 'changed': True, 'item': {'image': 'docker.io/pycontribs/ubuntu:latest', 'name': 'ubuntu', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=5    changed=2    unreachable=0    failed=0    skipped=4    rescued=0    ignored=0
+
+INFO     Running default > prepare
+WARNING  Skipping, prepare playbook not configured.
+INFO     Running default > converge
+
+PLAY [Converge] ****************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ubuntu]
+ok: [centos8]
+ok: [centos7]
+
+TASK [Detect python3 version] **************************************************
+ok: [centos8]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Set python version of script to 3] ***************************************
+skipping: [centos7]
+ok: [centos8]
+ok: [ubuntu]
+
+TASK [Download SystemD replacer v3] ********************************************
+skipping: [centos7]
+changed: [ubuntu]
+changed: [centos8]
+
+TASK [Download SystemD replacer v2] ********************************************
+skipping: [centos8]
+skipping: [ubuntu]
+changed: [centos7]
+
+TASK [Create systemd directories] **********************************************
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/run/systemd/system",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [centos7] => (item=/run/systemd/system)
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/run/systemd/system",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [centos8] => (item=/run/systemd/system)
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/run/systemd/system",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [ubuntu] => (item=/run/systemd/system)
+ok: [centos7] => (item=/usr/lib/systemd/system)
+ok: [centos8] => (item=/usr/lib/systemd/system)
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/usr/lib/systemd/system",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [ubuntu] => (item=/usr/lib/systemd/system)
+
+TASK [Replace systemctl] *******************************************************
+changed: [centos7]
+changed: [ubuntu]
+changed: [centos8]
+
+TASK [ReCollect system info] ***************************************************
+ok: [centos8]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Get Clickhouse IP from docker engine] ************************************
+ok: [centos7 -> localhost]
+ok: [centos8 -> localhost]
+ok: [ubuntu -> localhost]
+
+TASK [Set Clickhouse IP to facts] **********************************************
+ok: [centos7]
+ok: [centos8]
+ok: [ubuntu]
+
+TASK [Include vector-role] *****************************************************
+
+TASK [vector-role : Download distrib] ******************************************
+changed: [ubuntu]
+changed: [centos8]
+changed: [centos7]
+
+TASK [vector-role : Create distrib directory] **********************************
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/root/vector",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [ubuntu]
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/root/vector",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [centos7]
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/root/vector",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [centos8]
+
+TASK [vector-role : Unpack vector distrib by unarchive] ************************
+changed: [centos8]
+changed: [ubuntu]
+changed: [centos7]
+
+TASK [vector-role : Install vector executable] *********************************
+changed: [centos8]
+changed: [centos7]
+changed: [ubuntu]
+
+TASK [vector-role : Create vector directories] *********************************
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/var/lib/vector",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [centos7] => (item=/var/lib/vector)
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/var/lib/vector",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [centos8] => (item=/var/lib/vector)
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/var/lib/vector",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [ubuntu] => (item=/var/lib/vector)
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/etc/vector",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [centos7] => (item=/etc/vector)
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/etc/vector",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [centos8] => (item=/etc/vector)
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/etc/vector",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [ubuntu] => (item=/etc/vector)
+
+TASK [vector-role : Create test directory] *************************************
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/root/test",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [centos7]
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/root/test",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [centos8]
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/root/test",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [ubuntu]
+
+TASK [vector-role : Install vector configuration] ******************************
+--- before
++++ after: /home/.ansible/tmp/ansible-local-38634vd4fbr1r/tmp2m12gnzi/vector.toml.j2
+@@ -0,0 +1,24 @@
++# Set global options
++data_dir = "/var/lib/vector"
++
++# Vector's API (disabled by default)
++# Enable and try it out with the `vector top` command
++[api]
++enabled = true
++address = "0.0.0.0:8686"
++
++[sources.test_log]
++type = "file"
++ignore_older_secs = 600
++include = [ "/root/test/*.log" ]
++read_from = "beginning"
++
++[sinks.clickhouse]
++type = "clickhouse"
++inputs = [ "test_log" ]
++database = "logs"
++endpoint = "http://172.17.0.2:8123"
++table = "file_log"
++compression = "gzip"
++auth = { user = "user", password = "userlog", strategy = "basic" }
++skip_unknown_fields = true
+
+changed: [centos7]
+--- before
++++ after: /home/.ansible/tmp/ansible-local-38634vd4fbr1r/tmpvgzhew_n/vector.toml.j2
+@@ -0,0 +1,24 @@
++# Set global options
++data_dir = "/var/lib/vector"
++
++# Vector's API (disabled by default)
++# Enable and try it out with the `vector top` command
++[api]
++enabled = true
++address = "0.0.0.0:8686"
++
++[sources.test_log]
++type = "file"
++ignore_older_secs = 600
++include = [ "/root/test/*.log" ]
++read_from = "beginning"
++
++[sinks.clickhouse]
++type = "clickhouse"
++inputs = [ "test_log" ]
++database = "logs"
++endpoint = "http://172.17.0.2:8123"
++table = "file_log"
++compression = "gzip"
++auth = { user = "user", password = "userlog", strategy = "basic" }
++skip_unknown_fields = true
+
+changed: [ubuntu]
+--- before
++++ after: /home/.ansible/tmp/ansible-local-38634vd4fbr1r/tmpdsjgvgmu/vector.toml.j2
+@@ -0,0 +1,24 @@
++# Set global options
++data_dir = "/var/lib/vector"
++
++# Vector's API (disabled by default)
++# Enable and try it out with the `vector top` command
++[api]
++enabled = true
++address = "0.0.0.0:8686"
++
++[sources.test_log]
++type = "file"
++ignore_older_secs = 600
++include = [ "/root/test/*.log" ]
++read_from = "beginning"
++
++[sinks.clickhouse]
++type = "clickhouse"
++inputs = [ "test_log" ]
++database = "logs"
++endpoint = "http://172.17.0.2:8123"
++table = "file_log"
++compression = "gzip"
++auth = { user = "user", password = "userlog", strategy = "basic" }
++skip_unknown_fields = true
+
+changed: [centos8]
+
+TASK [vector-role : Install vector service file] *******************************
+--- before
++++ after: /home/.ansible/tmp/ansible-local-38634vd4fbr1r/tmp9t21ccx1/vector.service.j2
+@@ -0,0 +1,16 @@
++[Unit]
++Description=Vector
++Documentation=https://vector.dev
++After=network-online.target
++Requires=network-online.target
++
++[Service]
++ExecStart=/usr/bin/vector -c /etc/vector/vector.toml
++ExecReload=/usr/bin/vector -c /etc/vector/vector.toml validate
++ExecReload=/bin/kill -HUP $MAINPID
++Restart=no
++AmbientCapabilities=CAP_NET_BIND_SERVICE
++EnvironmentFile=-/etc/default/vector
++
++[Install]
++WantedBy=multi-user.target
+
+changed: [centos7]
+--- before
++++ after: /home/.ansible/tmp/ansible-local-38634vd4fbr1r/tmpx5rqhlvm/vector.service.j2
+@@ -0,0 +1,16 @@
++[Unit]
++Description=Vector
++Documentation=https://vector.dev
++After=network-online.target
++Requires=network-online.target
++
++[Service]
++ExecStart=/usr/bin/vector -c /etc/vector/vector.toml
++ExecReload=/usr/bin/vector -c /etc/vector/vector.toml validate
++ExecReload=/bin/kill -HUP $MAINPID
++Restart=no
++AmbientCapabilities=CAP_NET_BIND_SERVICE
++EnvironmentFile=-/etc/default/vector
++
++[Install]
++WantedBy=multi-user.target
+
+changed: [centos8]
+--- before
++++ after: /home/.ansible/tmp/ansible-local-38634vd4fbr1r/tmpyx13qio2/vector.service.j2
+@@ -0,0 +1,16 @@
++[Unit]
++Description=Vector
++Documentation=https://vector.dev
++After=network-online.target
++Requires=network-online.target
++
++[Service]
++ExecStart=/usr/bin/vector -c /etc/vector/vector.toml
++ExecReload=/usr/bin/vector -c /etc/vector/vector.toml validate
++ExecReload=/bin/kill -HUP $MAINPID
++Restart=no
++AmbientCapabilities=CAP_NET_BIND_SERVICE
++EnvironmentFile=-/etc/default/vector
++
++[Install]
++WantedBy=multi-user.target
+
+changed: [ubuntu]
+
+TASK [vector-role : Enable vector service] *************************************
+changed: [ubuntu]
+changed: [centos8]
+changed: [centos7]
+
+RUNNING HANDLER [vector-role : Start vector service] ***************************
+changed: [centos8]
+changed: [ubuntu]
+changed: [centos7]
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=18   changed=13   unreachable=0    failed=0    skipped=2    rescued=0    ignored=0
+centos8                    : ok=19   changed=13   unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+ubuntu                     : ok=19   changed=13   unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Running default > idempotence
+
+PLAY [Converge] ****************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [centos8]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Detect python3 version] **************************************************
+ok: [ubuntu]
+ok: [centos8]
+ok: [centos7]
+
+TASK [Set python version of script to 3] ***************************************
+skipping: [centos7]
+ok: [centos8]
+ok: [ubuntu]
+
+TASK [Download SystemD replacer v3] ********************************************
+skipping: [centos7]
+ok: [ubuntu]
+ok: [centos8]
+
+TASK [Download SystemD replacer v2] ********************************************
+skipping: [centos8]
+skipping: [ubuntu]
+ok: [centos7]
+
+TASK [Create systemd directories] **********************************************
+ok: [centos7] => (item=/run/systemd/system)
+ok: [centos8] => (item=/run/systemd/system)
+ok: [ubuntu] => (item=/run/systemd/system)
+ok: [centos7] => (item=/usr/lib/systemd/system)
+ok: [ubuntu] => (item=/usr/lib/systemd/system)
+ok: [centos8] => (item=/usr/lib/systemd/system)
+
+TASK [Replace systemctl] *******************************************************
+ok: [centos7]
+ok: [ubuntu]
+ok: [centos8]
+
+TASK [ReCollect system info] ***************************************************
+ok: [centos8]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Get Clickhouse IP from docker engine] ************************************
+ok: [centos7 -> localhost]
+ok: [centos8 -> localhost]
+ok: [ubuntu -> localhost]
+
+TASK [Set Clickhouse IP to facts] **********************************************
+ok: [centos7]
+ok: [centos8]
+ok: [ubuntu]
+
+TASK [Include vector-role] *****************************************************
+
+TASK [vector-role : Download distrib] ******************************************
+ok: [centos7]
+ok: [ubuntu]
+ok: [centos8]
+
+TASK [vector-role : Create distrib directory] **********************************
+ok: [centos7]
+ok: [centos8]
+ok: [ubuntu]
+
+TASK [vector-role : Unpack vector distrib by unarchive] ************************
+ok: [ubuntu]
+ok: [centos8]
+ok: [centos7]
+
+TASK [vector-role : Install vector executable] *********************************
+ok: [centos7]
+ok: [ubuntu]
+ok: [centos8]
+
+TASK [vector-role : Create vector directories] *********************************
+ok: [centos7] => (item=/var/lib/vector)
+ok: [ubuntu] => (item=/var/lib/vector)
+ok: [centos8] => (item=/var/lib/vector)
+ok: [centos7] => (item=/etc/vector)
+ok: [centos8] => (item=/etc/vector)
+ok: [ubuntu] => (item=/etc/vector)
+
+TASK [vector-role : Create test directory] *************************************
+ok: [centos7]
+ok: [centos8]
+ok: [ubuntu]
+
+TASK [vector-role : Install vector configuration] ******************************
+ok: [centos7]
+ok: [centos8]
+ok: [ubuntu]
+
+TASK [vector-role : Install vector service file] *******************************
+ok: [centos7]
+ok: [centos8]
+ok: [ubuntu]
+
+TASK [vector-role : Enable vector service] *************************************
+ok: [ubuntu]
+ok: [centos8]
+ok: [centos7]
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=17   changed=0    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0
+centos8                    : ok=18   changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+ubuntu                     : ok=18   changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Idempotence completed successfully.
+INFO     Running default > side_effect
+WARNING  Skipping, side effect playbook not configured.
+INFO     Running default > verify
+INFO     Running Ansible Verifier
+
+PLAY [Verify vector installation] **********************************************
+
+TASK [Get information about vector] ********************************************
+ok: [centos8]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Assert vector service] ***************************************************
+ok: [centos7] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+ok: [centos8] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+ok: [ubuntu] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+TASK [Validate vector configuration] *******************************************
+ok: [centos8]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Assert vector healthcheck] ***********************************************
+ok: [centos7] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+ok: [centos8] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+ok: [ubuntu] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+centos8                    : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+ubuntu                     : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Verifier completed successfully.
+INFO     Running default > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running default > destroy
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item=centos7)
+changed: [localhost] => (item=centos8)
+changed: [localhost] => (item=ubuntu)
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+FAILED - RETRYING: [localhost]: Wait for instance(s) deletion to complete (300 retries left).
+changed: [localhost] => (item=centos7)
+changed: [localhost] => (item=centos8)
+changed: [localhost] => (item=ubuntu)
+
+TASK [Delete docker networks(s)] ***********************************************
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Pruning extra files from scenario ephemeral directory
+root@ubuntu:~/vector-role$
+```
+</details>
+
+---
+
+### 5. Добавьте новый тег на коммит с рабочим сценарием в соответствии с семантическим версионированием.
+
+Для успешного тестирования роли был необходим функционирующий экземпляр **Clickhouse**, для чего выполнялось его расзворачивание в отдельном контейнере **docker**
+
+Файл [манифеста](clickhouse/docker-compose.yml) **Docker compose**
+
+```yaml
+---
+version: "2.4"
+services:
+  clickhouse_vm:
+    image: pycontribs/centos:7
+    container_name: clickhouse-01
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+    tty: true
+    network_mode: bridge
+...
+```
+
+После создания контейнера, на нём применена роль [Ansible-clickhouse](https://github.com/NamorNinayzuk/ansible-clickhouse).
+
+Все необходимые файлы инфраструктуры [тут](clickhouse/)
+
+---
+
+## Tox
+
+> 1. Добавьте в директорию с vector-role файлы из [директории](./example)
+> 1. Запустите `docker run --privileged=True -v <path_to_repo>:/opt/vector-role -w /opt/vector-role -it aragast/netology:latest /bin/bash`, где path_to_repo - путь до корня репозитория с vector-role на вашей файловой системе.
+> 1. Внутри контейнера выполните команду `tox`, посмотрите на вывод.
+> 1. Создайте облегчённый сценарий для `molecule` с драйвером `molecule_podman`. Проверьте его на исполнимость.
+> 1. Пропишите правильную команду в `tox.ini` для того чтобы запускался облегчённый сценарий.
+> 1. Запустите команду `tox`. Убедитесь, что всё отработало успешно.
+> 1. Добавьте новый тег на коммит с рабочим сценарием в соответствии с семантическим версионированием.
+> 
+> После выполнения у вас должно получится два сценария molecule и один tox.ini файл в репозитории.
+> Ссылка на репозиторий являются ответами на домашнее задание.
+> Не забудьте указать в ответе теги решений Tox и Molecule заданий.
+Используемое окружение:
+
+```console
+root@ubuntu:~/vector-role$ molecule --version
+molecule 4.0.1 using python 3.10
+    ansible:2.13.3
+    delegated:4.0.1 from molecule
+    docker:2.0.0 from molecule_docker requiring collections: community.docker>=3.0.0-a2
+    podman:2.0.2 from molecule_podman requiring collections: containers.podman>=1.7.0 ansible.posix>=1.3.0
+root@ubuntu:~/vector-role$
+```
+
+Чтобы не множить остановленные после завершения работы **Docker** контейнеры в строку запуска добавлен параметр `--rm`
+
+Первый запуск **Tox** внутри контейнера:
+
+```console
+root@ubuntu:~/vector-role$ docker run --privileged=True --rm -v ~/vector-role:/opt/vector-role -w /opt/vector-role -it aragast/netology:latest /bin/bash
+[root@f8b40ec440dc vector-role]# tox
+py37-ansible210 create: /opt/vector-role/.tox/py37-ansible210
+py37-ansible210 installdeps: -rtox-requirements.txt, ansible<3.0
+py37-ansible210 installed: ansible==2.10.7,ansible-base==2.10.17,ansible-compat==1.0.0,ansible-lint==5.1.3,arrow==1.2.3,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,cached-property==1.5.2,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,importlib-metadata==4.12.0,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,typing_extensions==4.3.0,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3,zipp==3.8.1
+py37-ansible210 run-test-pre: PYTHONHASHSEED='1189971644'
+py37-ansible210 run-test: commands[0] | molecule test -s compatibility --destroy always
+CRITICAL 'molecule/compatibility/molecule.yml' glob failed.  Exiting.
+ERROR: InvocationError for command /opt/vector-role/.tox/py37-ansible210/bin/molecule test -s compatibility --destroy always (exited with code 1)
+py37-ansible30 create: /opt/vector-role/.tox/py37-ansible30
+py37-ansible30 installdeps: -rtox-requirements.txt, ansible<3.1
+py37-ansible30 installed: ansible==3.0.0,ansible-base==2.10.17,ansible-compat==1.0.0,ansible-lint==5.1.3,arrow==1.2.3,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,cached-property==1.5.2,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,importlib-metadata==4.12.0,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,typing_extensions==4.3.0,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3,zipp==3.8.1
+py37-ansible30 run-test-pre: PYTHONHASHSEED='1189971644'
+py37-ansible30 run-test: commands[0] | molecule test -s compatibility --destroy always
+CRITICAL 'molecule/compatibility/molecule.yml' glob failed.  Exiting.
+ERROR: InvocationError for command /opt/vector-role/.tox/py37-ansible30/bin/molecule test -s compatibility --destroy always (exited with code 1)
+py39-ansible210 create: /opt/vector-role/.tox/py39-ansible210
+py39-ansible210 installdeps: -rtox-requirements.txt, ansible<3.0
+py39-ansible210 installed: ansible==2.10.7,ansible-base==2.10.17,ansible-compat==2.2.0,ansible-lint==5.1.3,arrow==1.2.3,attrs==22.1.0,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,jsonschema==4.16.0,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,pyrsistent==0.18.1,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3
+py39-ansible210 run-test-pre: PYTHONHASHSEED='1189971644'
+py39-ansible210 run-test: commands[0] | molecule test -s compatibility --destroy always
+CRITICAL 'molecule/compatibility/molecule.yml' glob failed.  Exiting.
+ERROR: InvocationError for command /opt/vector-role/.tox/py39-ansible210/bin/molecule test -s compatibility --destroy always (exited with code 1)
+py39-ansible30 create: /opt/vector-role/.tox/py39-ansible30
+py39-ansible30 installdeps: -rtox-requirements.txt, ansible<3.1
+py39-ansible30 installed: ansible==3.0.0,ansible-base==2.10.17,ansible-compat==2.2.0,ansible-lint==5.1.3,arrow==1.2.3,attrs==22.1.0,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,jsonschema==4.16.0,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,pyrsistent==0.18.1,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3
+py39-ansible30 run-test-pre: PYTHONHASHSEED='1189971644'
+py39-ansible30 run-test: commands[0] | molecule test -s compatibility --destroy always
+CRITICAL 'molecule/compatibility/molecule.yml' glob failed.  Exiting.
+ERROR: InvocationError for command /opt/vector-role/.tox/py39-ansible30/bin/molecule test -s compatibility --destroy always (exited with code 1)
+_______________________________________________________ summary ________________________________________________________
+ERROR:   py37-ansible210: commands failed
+ERROR:   py37-ansible30: commands failed
+ERROR:   py39-ansible210: commands failed
+ERROR:   py39-ansible30: commands failed
+[root@f8b40ec440dc vector-role]#
+```
+
+> Так как **Docker** контейнер запускался с проброшеным внутрь каталогом роли (`-v ~/vector-role:/opt/vector-role`),
+> то выполнение **Tox** создало кэш используемых окружений вне контейнера (каталог `~/vector-role/.tox`),
+> что позволяет повторно их использовать даже после удаления и пересоздания контейнера (поэтому использование параметра `--rm` вполне оправдано)
+Из сообщений видно, что все проверки **Tox** завершились одинаковой ошибкой, связанной с исполняемой командой,
+а именно: `molecule test -s compatibility --destroy always`, что логично, потому что сценария `compatibility` в роли нет.
+
+Инициализация нового сценария с драйвером **podman**
+
+```console
+root@ubuntu:~/vector-role$ molecule init scenario podman --driver-name podman
+INFO     Initializing new scenario podman...
+INFO     Initialized scenario in /home/vector-role/molecule/podman successfully.
+root@ubuntu:~/vector-role$
+```
+
+<details>
+<summary>:exclamation: Вывод работы <b>Tox</b> на сокращённом сценарии... Лог длинный :bangbang:</summary>
+
+```console
+[root@a906a0f6163d vector-role]# tox
+py37-ansible210 installed: ansible==2.10.7,ansible-base==2.10.17,ansible-compat==1.0.0,ansible-lint==5.1.3,arrow==1.2.3,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,cached-property==1.5.2,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,importlib-metadata==4.12.0,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,typing_extensions==4.3.0,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3,zipp==3.8.1
+py37-ansible210 run-test-pre: PYTHONHASHSEED='2945318393'
+py37-ansible210 run-test: commands[0] | molecule test -s podman --destroy always
+INFO     podman scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
+INFO     Performing prerun...
+WARNING  Failed to locate command: [Errno 2] No such file or directory: 'git': 'git'
+INFO     Guessed /opt/vector-role as project root directory
+INFO     Using /root/.cache/ansible-lint/b984a4/roles/artem_shtepa.vector_role symlink to current repository in order to enable Ansible to find the role using its expected full name.
+INFO     Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/root/.cache/ansible-lint/b984a4/roles
+INFO     Running podman > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running podman > lint
+INFO     Lint is disabled.
+INFO     Running podman > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running podman > destroy
+INFO     Sanity checks: 'podman'
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True})
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '269176633897.3284', 'results_file': '/root/.ansible_async/269176633897.3284', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Running podman > syntax
+
+playbook: /opt/vector-role/molecule/resources/converge.yml
+INFO     Running podman > create
+
+PLAY [Create] ******************************************************************
+
+TASK [get podman executable path] **********************************************
+ok: [localhost]
+
+TASK [save path to executable as fact] *****************************************
+ok: [localhost]
+
+TASK [Log into a container registry] *******************************************
+skipping: [localhost] => (item="centos7 registry username: None specified")
+
+TASK [Check presence of custom Dockerfiles] ************************************
+ok: [localhost] => (item=Dockerfile: None specified)
+
+TASK [Create Dockerfiles from image names] *************************************
+skipping: [localhost] => (item="Dockerfile: None specified; Image: docker.io/pycontribs/centos:7")
+
+TASK [Discover local Podman images] ********************************************
+ok: [localhost] => (item=centos7)
+
+TASK [Build an Ansible compatible image] ***************************************
+skipping: [localhost] => (item=docker.io/pycontribs/centos:7)
+
+TASK [Determine the CMD directives] ********************************************
+ok: [localhost] => (item="centos7 command: None specified")
+
+TASK [Remove possible pre-existing containers] *********************************
+changed: [localhost]
+
+TASK [Discover local podman networks] ******************************************
+skipping: [localhost] => (item=centos7: None specified)
+
+TASK [Create podman network dedicated to this scenario] ************************
+skipping: [localhost]
+
+TASK [Create molecule instance(s)] *********************************************
+changed: [localhost] => (item=centos7)
+
+TASK [Wait for instance(s) creation to complete] *******************************
+failed: [localhost] (item=centos7) => {"ansible_job_id": "864829238242.3454", "ansible_loop_var": "item", "attempts": 1, "changed": true, "cmd": ["/usr/bin/podman", "run", "-d", "--name", "centos7", "--hostname=centos7", "docker.io/pycontribs/centos:7", "bash", "-c", "while true; do sleep 10000; done"], "delta": "0:00:00.047901", "end": "2022-09-11 11:34:41.767148", "finished": 1, "item": {"ansible_job_id": "864829238242.3454", "ansible_loop_var": "item", "changed": true, "failed": false, "finished": 0, "item": {"image": "docker.io/pycontribs/centos:7", "name": "centos7", "pre_build_image": true}, "results_file": "/root/.ansible_async/864829238242.3454", "started": 1}, "msg": "non-zero return code", "rc": 125, "start": "2022-09-11 11:34:41.719247", "stderr": "Error: invalid config provided: cannot set hostname when running in the host UTS namespace: invalid configuration", "stderr_lines": ["Error: invalid config provided: cannot set hostname when running in the host UTS namespace: invalid configuration"], "stdout": "", "stdout_lines": []}
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=7    changed=2    unreachable=0    failed=1    skipped=5    rescued=0    ignored=0
+
+CRITICAL Ansible return code was 2, command was: ['ansible-playbook', '--inventory', '/root/.cache/molecule/vector-role/podman/inventory', '--skip-tags', 'molecule-notest,notest', '/opt/vector-role/.tox/py37-ansible210/lib/python3.7/site-packages/molecule_podman/playbooks/create.yml']
+WARNING  An error occurred during the test sequence action: 'create'. Cleaning up.
+INFO     Running podman > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running podman > destroy
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True})
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '824208785878.3511', 'results_file': '/root/.ansible_async/824208785878.3511', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Pruning extra files from scenario ephemeral directory
+ERROR: InvocationError for command /opt/vector-role/.tox/py37-ansible210/bin/molecule test -s podman --destroy always (exited with code 1)
+py37-ansible30 installed: ansible==3.0.0,ansible-base==2.10.17,ansible-compat==1.0.0,ansible-lint==5.1.3,arrow==1.2.3,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,cached-property==1.5.2,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,importlib-metadata==4.12.0,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,typing_extensions==4.3.0,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3,zipp==3.8.1
+py37-ansible30 run-test-pre: PYTHONHASHSEED='2945318393'
+py37-ansible30 run-test: commands[0] | molecule test -s podman --destroy always
+INFO     podman scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
+INFO     Performing prerun...
+WARNING  Failed to locate command: [Errno 2] No such file or directory: 'git': 'git'
+INFO     Guessed /opt/vector-role as project root directory
+INFO     Using /root/.cache/ansible-lint/b984a4/roles/artem_shtepa.vector_role symlink to current repository in order to enable Ansible to find the role using its expected full name.
+INFO     Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/root/.cache/ansible-lint/b984a4/roles
+INFO     Running podman > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running podman > lint
+INFO     Lint is disabled.
+INFO     Running podman > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running podman > destroy
+INFO     Sanity checks: 'podman'
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True})
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '266779808633.3605', 'results_file': '/root/.ansible_async/266779808633.3605', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Running podman > syntax
+
+playbook: /opt/vector-role/molecule/resources/converge.yml
+INFO     Running podman > create
+
+PLAY [Create] ******************************************************************
+
+TASK [get podman executable path] **********************************************
+ok: [localhost]
+
+TASK [save path to executable as fact] *****************************************
+ok: [localhost]
+
+TASK [Log into a container registry] *******************************************
+skipping: [localhost] => (item="centos7 registry username: None specified")
+
+TASK [Check presence of custom Dockerfiles] ************************************
+ok: [localhost] => (item=Dockerfile: None specified)
+
+TASK [Create Dockerfiles from image names] *************************************
+skipping: [localhost] => (item="Dockerfile: None specified; Image: docker.io/pycontribs/centos:7")
+
+TASK [Discover local Podman images] ********************************************
+ok: [localhost] => (item=centos7)
+
+TASK [Build an Ansible compatible image] ***************************************
+skipping: [localhost] => (item=docker.io/pycontribs/centos:7)
+
+TASK [Determine the CMD directives] ********************************************
+ok: [localhost] => (item="centos7 command: None specified")
+
+TASK [Remove possible pre-existing containers] *********************************
+changed: [localhost]
+
+TASK [Discover local podman networks] ******************************************
+skipping: [localhost] => (item=centos7: None specified)
+
+TASK [Create podman network dedicated to this scenario] ************************
+skipping: [localhost]
+
+TASK [Create molecule instance(s)] *********************************************
+changed: [localhost] => (item=centos7)
+
+TASK [Wait for instance(s) creation to complete] *******************************
+failed: [localhost] (item=centos7) => {"ansible_job_id": "386413707022.3774", "ansible_loop_var": "item", "attempts": 1, "changed": true, "cmd": ["/usr/bin/podman", "run", "-d", "--name", "centos7", "--hostname=centos7", "docker.io/pycontribs/centos:7", "bash", "-c", "while true; do sleep 10000; done"], "delta": "0:00:00.043561", "end": "2022-09-11 11:34:55.340619", "finished": 1, "item": {"ansible_job_id": "386413707022.3774", "ansible_loop_var": "item", "changed": true, "failed": false, "finished": 0, "item": {"image": "docker.io/pycontribs/centos:7", "name": "centos7", "pre_build_image": true}, "results_file": "/root/.ansible_async/386413707022.3774", "started": 1}, "msg": "non-zero return code", "rc": 125, "start": "2022-09-11 11:34:55.297058", "stderr": "Error: invalid config provided: cannot set hostname when running in the host UTS namespace: invalid configuration", "stderr_lines": ["Error: invalid config provided: cannot set hostname when running in the host UTS namespace: invalid configuration"], "stdout": "", "stdout_lines": []}
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=7    changed=2    unreachable=0    failed=1    skipped=5    rescued=0    ignored=0
+
+CRITICAL Ansible return code was 2, command was: ['ansible-playbook', '--inventory', '/root/.cache/molecule/vector-role/podman/inventory', '--skip-tags', 'molecule-notest,notest', '/opt/vector-role/.tox/py37-ansible30/lib/python3.7/site-packages/molecule_podman/playbooks/create.yml']
+WARNING  An error occurred during the test sequence action: 'create'. Cleaning up.
+INFO     Running podman > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running podman > destroy
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True})
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '931728167635.3832', 'results_file': '/root/.ansible_async/931728167635.3832', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Pruning extra files from scenario ephemeral directory
+ERROR: InvocationError for command /opt/vector-role/.tox/py37-ansible30/bin/molecule test -s podman --destroy always (exited with code 1)
+py39-ansible210 installed: ansible==2.10.7,ansible-base==2.10.17,ansible-compat==2.2.0,ansible-lint==5.1.3,arrow==1.2.3,attrs==22.1.0,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,jsonschema==4.16.0,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,pyrsistent==0.18.1,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3
+py39-ansible210 run-test-pre: PYTHONHASHSEED='2945318393'
+py39-ansible210 run-test: commands[0] | molecule test -s podman --destroy always
+INFO     podman scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
+INFO     Performing prerun...
+WARNING  Failed to locate command: [Errno 2] No such file or directory: 'git'
+INFO     Guessed /opt/vector-role as project root directory
+INFO     Using /root/.cache/ansible-lint/b984a4/roles/artem_shtepa.vector_role symlink to current repository in order to enable Ansible to find the role using its expected full name.
+INFO     Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/root/.cache/ansible-lint/b984a4/roles
+INFO     Running podman > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running podman > lint
+INFO     Lint is disabled.
+INFO     Running podman > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running podman > destroy
+INFO     Sanity checks: 'podman'
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True})
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '99216622436.3900', 'results_file': '/root/.ansible_async/99216622436.3900', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Running podman > syntax
+
+playbook: /opt/vector-role/molecule/resources/converge.yml
+INFO     Running podman > create
+
+PLAY [Create] ******************************************************************
+
+TASK [get podman executable path] **********************************************
+ok: [localhost]
+
+TASK [save path to executable as fact] *****************************************
+ok: [localhost]
+
+TASK [Log into a container registry] *******************************************
+skipping: [localhost] => (item="centos7 registry username: None specified")
+
+TASK [Check presence of custom Dockerfiles] ************************************
+ok: [localhost] => (item=Dockerfile: None specified)
+
+TASK [Create Dockerfiles from image names] *************************************
+skipping: [localhost] => (item="Dockerfile: None specified; Image: docker.io/pycontribs/centos:7")
+
+TASK [Discover local Podman images] ********************************************
+ok: [localhost] => (item=centos7)
+
+TASK [Build an Ansible compatible image] ***************************************
+skipping: [localhost] => (item=docker.io/pycontribs/centos:7)
+
+TASK [Determine the CMD directives] ********************************************
+ok: [localhost] => (item="centos7 command: None specified")
+
+TASK [Remove possible pre-existing containers] *********************************
+changed: [localhost]
+
+TASK [Discover local podman networks] ******************************************
+skipping: [localhost] => (item=centos7: None specified)
+
+TASK [Create podman network dedicated to this scenario] ************************
+skipping: [localhost]
+
+TASK [Create molecule instance(s)] *********************************************
+changed: [localhost] => (item=centos7)
+
+TASK [Wait for instance(s) creation to complete] *******************************
+failed: [localhost] (item=centos7) => {"ansible_job_id": "453345608163.4051", "ansible_loop_var": "item", "attempts": 1, "changed": true, "cmd": ["/usr/bin/podman", "run", "-d", "--name", "centos7", "--hostname=centos7", "docker.io/pycontribs/centos:7", "bash", "-c", "while true; do sleep 10000; done"], "delta": "0:00:00.044988", "end": "2022-09-11 11:35:08.693879", "finished": 1, "item": {"ansible_job_id": "453345608163.4051", "ansible_loop_var": "item", "changed": true, "failed": false, "finished": 0, "item": {"image": "docker.io/pycontribs/centos:7", "name": "centos7", "pre_build_image": true}, "results_file": "/root/.ansible_async/453345608163.4051", "started": 1}, "msg": "non-zero return code", "rc": 125, "start": "2022-09-11 11:35:08.648891", "stderr": "Error: invalid config provided: cannot set hostname when running in the host UTS namespace: invalid configuration", "stderr_lines": ["Error: invalid config provided: cannot set hostname when running in the host UTS namespace: invalid configuration"], "stdout": "", "stdout_lines": []}
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=7    changed=2    unreachable=0    failed=1    skipped=5    rescued=0    ignored=0
+
+CRITICAL Ansible return code was 2, command was: ['ansible-playbook', '--inventory', '/root/.cache/molecule/vector-role/podman/inventory', '--skip-tags', 'molecule-notest,notest', '/opt/vector-role/.tox/py39-ansible210/lib/python3.9/site-packages/molecule_podman/playbooks/create.yml']
+WARNING  An error occurred during the test sequence action: 'create'. Cleaning up.
+INFO     Running podman > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running podman > destroy
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True})
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '173151728599.4100', 'results_file': '/root/.ansible_async/173151728599.4100', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Pruning extra files from scenario ephemeral directory
+ERROR: InvocationError for command /opt/vector-role/.tox/py39-ansible210/bin/molecule test -s podman --destroy always (exited with code 1)
+py39-ansible30 installed: ansible==3.0.0,ansible-base==2.10.17,ansible-compat==2.2.0,ansible-lint==5.1.3,arrow==1.2.3,attrs==22.1.0,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,jsonschema==4.16.0,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,pyrsistent==0.18.1,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3
+py39-ansible30 run-test-pre: PYTHONHASHSEED='2945318393'
+py39-ansible30 run-test: commands[0] | molecule test -s podman --destroy always
+INFO     podman scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
+INFO     Performing prerun...
+WARNING  Failed to locate command: [Errno 2] No such file or directory: 'git'
+INFO     Guessed /opt/vector-role as project root directory
+INFO     Using /root/.cache/ansible-lint/b984a4/roles/artem_shtepa.vector_role symlink to current repository in order to enable Ansible to find the role using its expected full name.
+INFO     Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/root/.cache/ansible-lint/b984a4/roles
+INFO     Running podman > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running podman > lint
+INFO     Lint is disabled.
+INFO     Running podman > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running podman > destroy
+INFO     Sanity checks: 'podman'
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True})
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '331091900457.4161', 'results_file': '/root/.ansible_async/331091900457.4161', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Running podman > syntax
+
+playbook: /opt/vector-role/molecule/resources/converge.yml
+INFO     Running podman > create
+
+PLAY [Create] ******************************************************************
+
+TASK [get podman executable path] **********************************************
+ok: [localhost]
+
+TASK [save path to executable as fact] *****************************************
+ok: [localhost]
+
+TASK [Log into a container registry] *******************************************
+skipping: [localhost] => (item="centos7 registry username: None specified")
+
+TASK [Check presence of custom Dockerfiles] ************************************
+ok: [localhost] => (item=Dockerfile: None specified)
+
+TASK [Create Dockerfiles from image names] *************************************
+skipping: [localhost] => (item="Dockerfile: None specified; Image: docker.io/pycontribs/centos:7")
+
+TASK [Discover local Podman images] ********************************************
+ok: [localhost] => (item=centos7)
+
+TASK [Build an Ansible compatible image] ***************************************
+skipping: [localhost] => (item=docker.io/pycontribs/centos:7)
+
+TASK [Determine the CMD directives] ********************************************
+ok: [localhost] => (item="centos7 command: None specified")
+
+TASK [Remove possible pre-existing containers] *********************************
+changed: [localhost]
+
+TASK [Discover local podman networks] ******************************************
+skipping: [localhost] => (item=centos7: None specified)
+
+TASK [Create podman network dedicated to this scenario] ************************
+skipping: [localhost]
+
+TASK [Create molecule instance(s)] *********************************************
+changed: [localhost] => (item=centos7)
+
+TASK [Wait for instance(s) creation to complete] *******************************
+failed: [localhost] (item=centos7) => {"ansible_job_id": "655377812848.4313", "ansible_loop_var": "item", "attempts": 1, "changed": true, "cmd": ["/usr/bin/podman", "run", "-d", "--name", "centos7", "--hostname=centos7", "docker.io/pycontribs/centos:7", "bash", "-c", "while true; do sleep 10000; done"], "delta": "0:00:00.062807", "end": "2022-09-11 11:35:22.013978", "finished": 1, "item": {"ansible_job_id": "655377812848.4313", "ansible_loop_var": "item", "changed": true, "failed": false, "finished": 0, "item": {"image": "docker.io/pycontribs/centos:7", "name": "centos7", "pre_build_image": true}, "results_file": "/root/.ansible_async/655377812848.4313", "started": 1}, "msg": "non-zero return code", "rc": 125, "start": "2022-09-11 11:35:21.951171", "stderr": "Error: invalid config provided: cannot set hostname when running in the host UTS namespace: invalid configuration", "stderr_lines": ["Error: invalid config provided: cannot set hostname when running in the host UTS namespace: invalid configuration"], "stdout": "", "stdout_lines": []}
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=7    changed=2    unreachable=0    failed=1    skipped=5    rescued=0    ignored=0
+
+CRITICAL Ansible return code was 2, command was: ['ansible-playbook', '--inventory', '/root/.cache/molecule/vector-role/podman/inventory', '--skip-tags', 'molecule-notest,notest', '/opt/vector-role/.tox/py39-ansible30/lib/python3.9/site-packages/molecule_podman/playbooks/create.yml']
+WARNING  An error occurred during the test sequence action: 'create'. Cleaning up.
+INFO     Running podman > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running podman > destroy
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True})
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '954966452117.4363', 'results_file': '/root/.ansible_async/954966452117.4363', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:7', 'name': 'centos7', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Pruning extra files from scenario ephemeral directory
+ERROR: InvocationError for command /opt/vector-role/.tox/py39-ansible30/bin/molecule test -s podman --destroy always (exited with code 1)
+_______________________________________________________ summary ________________________________________________________
+ERROR:   py37-ansible210: commands failed
+ERROR:   py37-ansible30: commands failed
+ERROR:   py39-ansible210: commands failed
+ERROR:   py39-ansible30: commands failed
+[root@a906a0f6163d vector-role]#
+```
+</details>
+
+Провалв прогоне роли **Tox** по причине - при выполнении драйвером **molecule_podman** команды `/usr/bin/podman run -d --name centos7 --hostname=centos7 docker.io/pycontribs/centos:7 bash -c "while true; do sleep 10000; done"`
+**podman** не удалось создать контейнер ( `Error: invalid config provided: cannot set hostname when running in the host UTS namespace: invalid configuration`), так как неверно задана конфигурация контейнера (нельзя указывать `--hostname`).
+
+> :exclamation: Решение данной проблемы я не вижу, ибо при модификации кода модуля **molecule_podman** с целью удаления этого параметра в данном случе не достаточно - возникают другие ошибки. НО! Если модифицировать `tox.ini` следующим образом:
+
+```ini
+[tox]
+minversion = 1.8
+basepython = python3.6
+envlist = py{37,39}-ansible{210,30}
+skipsdist = true
+[testenv]
+passenv = *
+deps =
+    -r tox-requirements.txt
+    ansible210: ansible<3.0
+    ansible30: ansible<3.1
+commands =
+    {posargs:ansible --version}
+    {posargs:python3 --version}
+    {posargs:python3 test.py}
+```
+
+а файл `test.py` наполнить следующим содержимым:
+
+```python
+#!/usr/bin/env python3
+print("OK\n")
+```
+
+то успешное выполнение **Tox** будет выглядеть следующим образом:
+
+```console
+[root@cd1242c242a5 vector-role]# tox
+py37-ansible210 installed: ansible==2.10.7,ansible-base==2.10.17,ansible-compat==1.0.0,ansible-lint==5.1.3,arrow==1.2.3,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,cached-property==1.5.2,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,importlib-metadata==4.12.0,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,typing_extensions==4.3.0,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3,zipp==3.8.1
+py37-ansible210 run-test-pre: PYTHONHASHSEED='1020171791'
+py37-ansible210 run-test: commands[0] | ansible --version
+ansible 2.10.17
+  config file = None
+  configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /opt/vector-role/.tox/py37-ansible210/lib/python3.7/site-packages/ansible
+  executable location = /opt/vector-role/.tox/py37-ansible210/bin/ansible
+  python version = 3.7.10 (default, Jun 13 2022, 19:37:24) [GCC 8.5.0 20210514 (Red Hat 8.5.0-10)]
+py37-ansible210 run-test: commands[1] | python3 --version
+Python 3.7.10
+py37-ansible210 run-test: commands[2] | python3 test.py
+OK
+
+py37-ansible30 installed: ansible==3.0.0,ansible-base==2.10.17,ansible-compat==1.0.0,ansible-lint==5.1.3,arrow==1.2.3,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,cached-property==1.5.2,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,importlib-metadata==4.12.0,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,typing_extensions==4.3.0,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3,zipp==3.8.1
+py37-ansible30 run-test-pre: PYTHONHASHSEED='1020171791'
+py37-ansible30 run-test: commands[0] | ansible --version
+ansible 2.10.17
+  config file = None
+  configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /opt/vector-role/.tox/py37-ansible30/lib/python3.7/site-packages/ansible
+  executable location = /opt/vector-role/.tox/py37-ansible30/bin/ansible
+  python version = 3.7.10 (default, Jun 13 2022, 19:37:24) [GCC 8.5.0 20210514 (Red Hat 8.5.0-10)]
+py37-ansible30 run-test: commands[1] | python3 --version
+Python 3.7.10
+py37-ansible30 run-test: commands[2] | python3 test.py
+OK
+
+py39-ansible210 installed: ansible==2.10.7,ansible-base==2.10.17,ansible-compat==2.2.0,ansible-lint==5.1.3,arrow==1.2.3,attrs==22.1.0,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,jsonschema==4.16.0,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,pyrsistent==0.18.1,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3
+py39-ansible210 run-test-pre: PYTHONHASHSEED='1020171791'
+py39-ansible210 run-test: commands[0] | ansible --version
+ansible 2.10.17
+  config file = None
+  configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /opt/vector-role/.tox/py39-ansible210/lib/python3.9/site-packages/ansible
+  executable location = /opt/vector-role/.tox/py39-ansible210/bin/ansible
+  python version = 3.9.2 (default, Jun 13 2022, 19:42:33) [GCC 8.5.0 20210514 (Red Hat 8.5.0-10)]
+py39-ansible210 run-test: commands[1] | python3 --version
+Python 3.9.2
+py39-ansible210 run-test: commands[2] | python3 test.py
+OK
+
+py39-ansible30 installed: ansible==3.0.0,ansible-base==2.10.17,ansible-compat==2.2.0,ansible-lint==5.1.3,arrow==1.2.3,attrs==22.1.0,bcrypt==4.0.0,binaryornot==0.4.4,bracex==2.3.post1,Cerberus==1.3.2,certifi==2022.6.15.1,cffi==1.15.1,chardet==5.0.0,charset-normalizer==2.1.1,click==8.1.3,click-help-colors==0.9.1,commonmark==0.9.1,cookiecutter==2.1.1,cryptography==38.0.1,distro==1.7.0,enrich==1.2.7,idna==3.3,Jinja2==3.1.2,jinja2-time==0.2.0,jmespath==1.0.1,jsonschema==4.16.0,lxml==4.9.1,MarkupSafe==2.1.1,molecule==3.4.0,molecule-podman==1.0.1,packaging==21.3,paramiko==2.11.0,pathspec==0.10.1,pluggy==0.13.1,pycparser==2.21,Pygments==2.13.0,PyNaCl==1.5.0,pyparsing==3.0.9,pyrsistent==0.18.1,python-dateutil==2.8.2,python-slugify==6.1.2,PyYAML==5.4.1,requests==2.28.1,rich==12.5.1,ruamel.yaml==0.17.21,ruamel.yaml.clib==0.2.6,selinux==0.2.1,six==1.16.0,subprocess-tee==0.3.5,tenacity==8.0.1,text-unidecode==1.3,urllib3==1.26.12,wcmatch==8.4,yamllint==1.26.3
+py39-ansible30 run-test-pre: PYTHONHASHSEED='1020171791'
+py39-ansible30 run-test: commands[0] | ansible --version
+ansible 2.10.17
+  config file = None
+  configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /opt/vector-role/.tox/py39-ansible30/lib/python3.9/site-packages/ansible
+  executable location = /opt/vector-role/.tox/py39-ansible30/bin/ansible
+  python version = 3.9.2 (default, Jun 13 2022, 19:42:33) [GCC 8.5.0 20210514 (Red Hat 8.5.0-10)]
+py39-ansible30 run-test: commands[1] | python3 --version
+Python 3.9.2
+py39-ansible30 run-test: commands[2] | python3 test.py
+OK
+
+_______________________________________________________ summary ________________________________________________________
+  py37-ansible210: commands succeeded
+  py37-ansible30: commands succeeded
+  py39-ansible210: commands succeeded
+  py39-ansible30: commands succeeded
+  congratulations :)
+[root@cd1242c242a5 vector-role]#
+```
+---
+
 
 ## Необязательная часть
 
@@ -2324,6 +3723,7 @@ root@ubuntu:~/ansible-clickhouse$
 
 В качестве решения пришлите ссылки и скриншоты этапов выполнения задания.
 
+Позже,может,быть
 ---
 
 ### Как оформить ДЗ?
