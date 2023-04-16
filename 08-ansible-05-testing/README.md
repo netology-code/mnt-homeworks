@@ -1018,14 +1018,12 @@ INFO     Pruning extra files from scenario ephemeral directory
 Используемое окружение на **Ubuntu 22**:
 
 ```console
-┌──(kali㉿kali)-[~/08-ansible-05/clickhouse]
-└─$ molecule --version
+root@ubuntu:~$ molecule --version
 molecule 4.0.1 using python 3.10
     ansible:2.13.3
     delegated:4.0.1 from molecule
     docker:2.0.0 from molecule_docker requiring collections: community.docker>=3.0.0-a2
-┌──(kali㉿kali)-[~/08-ansible-05/clickhouse]
-└─$ 
+root@ubuntu:~$
 ```
 
 Модифицированный `molecule/resources/playbooks/converge.yml`
@@ -1058,7 +1056,7 @@ molecule 4.0.1 using python 3.10
 <summary>:exclamation: Прогон теста <b>molecule</b>... Лог очень длинный :bangbang:</summary>
 
 ```console
-┌──(kali㉿kali)-[~/08-ansible-05/clickhouse] molecule test -s centos_7
+root@ubuntu:~/ansible-clickhouse$ molecule test -s centos_7
 INFO     centos_7 scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
 INFO     Performing prerun with role_name_check=0...
 INFO     Set ANSIBLE_LIBRARY=/home/.cache/ansible-compat/b9a93c/modules:/home/.ansible/plugins/modules:/usr/share/ansible/plugins/modules
@@ -2296,9 +2294,7 @@ PLAY RECAP *********************************************************************
 localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
 
 INFO     Pruning extra files from scenario ephemeral directory
-┌──(kali㉿kali)-[~/08-ansible-05/clickhouse]
-└─$ 
-
+root@ubuntu:~/ansible-clickhouse$
 '''
 
 ---
