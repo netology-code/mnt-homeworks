@@ -1052,8 +1052,7 @@ root@ubuntu:~$
         name: ansible-clickhouse
 ```
 
-<details>
-<summary>:exclamation: Прогон теста <b>molecule</b>... Лог очень длинный :bangbang:</summary>
+Тест <b>molecule</b>:
 
 ```console
 root@ubuntu:~/ansible-clickhouse$ molecule test -s centos_7
@@ -3203,8 +3202,7 @@ INFO     Initialized scenario in /home/vector-role/molecule/podman successfully.
 root@ubuntu:~/vector-role$
 ```
 
-<details>
-<summary>:exclamation: Вывод работы <b>Tox</b> на сокращённом сценарии... Лог длинный :bangbang:</summary>
+Вывод работы <b>Tox</b>:
 
 ```console
 [root@a906a0f6163d vector-role]# tox
