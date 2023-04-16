@@ -23,7 +23,7 @@
 
 ```console
 ┌──(kali㉿kali)-[~/08-ansible-05/clickhouse]
-└─$ molecule test -s cen
+└─$ molecule test -s centos_7
 INFO     centos_7 scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
 INFO     Performing prerun...
 INFO     Set ANSIBLE_LIBRARY=/home/.cache/ansible-compat/b9a93c/modules:/home/.ansible/plugins/modules:/usr/share/ansible/plugins/modules
