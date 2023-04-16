@@ -2403,11 +2403,9 @@ verifier:
           - "'enabled' == ansible_facts.services[service_name].status"
 ```
 > Переменная `service_name` должна содержать имя проверяемого сервиса
-Но, к сожалению, а данной работе это не применить, так как модуль **service_facts** не может определить установленный через скрипт сервис **vector**
+К сожалению модуль **service_facts** не может определить установленный через скрипт сервис **vector**
 
-<details>
-<summary>:exclamation: Полный лог тестирования роли с использованием <b>Molecule</b>... Лог длинный :bangbang:</summary>
-
+Лог тестирования роли с использованием <b>Molecule</b>:
 ```console
 root@ubuntu:~/vector-role$ molecule test
 INFO     default scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
@@ -3120,8 +3118,6 @@ services:
 
 После создания контейнера, на нём применена роль [Ansible-clickhouse](https://github.com/NamorNinayzuk/ansible-clickhouse).
 
-Все необходимые файлы инфраструктуры [тут](clickhouse/)
-
 ---
 
 ## Tox
@@ -3611,7 +3607,6 @@ ERROR:   py39-ansible210: commands failed
 ERROR:   py39-ansible30: commands failed
 [root@a906a0f6163d vector-role]#
 ```
-</details>
 
 Провалв прогоне роли **Tox** по причине - при выполнении драйвером **molecule_podman** команды `/usr/bin/podman run -d --name centos7 --hostname=centos7 docker.io/pycontribs/centos:7 bash -c "while true; do sleep 10000; done"`
 **podman** не удалось создать контейнер ( `Error: invalid config provided: cannot set hostname when running in the host UTS namespace: invalid configuration`), так как неверно задана конфигурация контейнера (нельзя указывать `--hostname`).
