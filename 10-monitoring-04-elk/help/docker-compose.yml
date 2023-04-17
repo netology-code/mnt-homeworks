@@ -1,16 +1,24 @@
+##Предварительно выполнить на Linux хосте команду: sudo sysctl -w vm.max_map_count=262144
+##https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_set_vm_max_map_count_to_at_least_262144
+#
+##kibana address: http://127.0.0.1:5601 будет доступно через ~1-2 мин
+#
+#
 version: '2.2'
 services:
 
   es-hot:
-    image: elasticsearch:7.11.1
+    image: elasticsearch:8.7.0
     container_name: es-hot
     environment:
       - node.name=es-hot
       - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=es-warm
+      - discovery.seed_hosts=es-hot,es-warm
       - cluster.initial_master_nodes=es-hot,es-warm
-      - bootstrap.memory_lock=true
+      - node.roles=master,data_content,data_hot  
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "http.host=0.0.0.0"
+      - xpack.security.enabled=false
     volumes:
       - data01:/usr/share/elasticsearch/data:Z
     ulimits:
@@ -28,15 +36,17 @@ services:
       - es-warm
 
   es-warm:
-    image: elasticsearch:7.11.1
+    image: elasticsearch:8.7.0
     container_name: es-warm
     environment:
       - node.name=es-warm
       - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=es-hot
+      - discovery.seed_hosts=es-hot,es-warm
       - cluster.initial_master_nodes=es-hot,es-warm
-      - bootstrap.memory_lock=true
+      - node.roles=master,data_warm
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+      - "http.host=0.0.0.0"
     volumes:
       - data02:/usr/share/elasticsearch/data:Z
     ulimits:
@@ -50,7 +60,7 @@ services:
       - elastic
 
   kibana:
-    image: kibana:7.11.1
+    image: kibana:8.7.0
     container_name: kibana
     ports:
       - 5601:5601
@@ -65,11 +75,13 @@ services:
 
   logstash:
     image: logstash:6.5.1
+
     container_name: logstash
     ports:
       - 5046:5046
+      - 5044:5044
     volumes:
-      - ./configs/logstash.conf:/etc/logstash/conf.d/logstash.conf:Z
+      - ./configs/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:Z
       - ./configs/logstash.yml:/opt/logstash/config/logstash.yml:Z
     networks:
       - elastic
@@ -88,12 +100,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:Z
     depends_on:
       - logstash
+    networks:
+      - elastic
 
   some_application:
     image: library/python:3.9-alpine
     container_name: some_app
     volumes:
-      - ./pinger/run.py:/opt/run.py:Z
+      - ./pinger/:/opt/:Z
     entrypoint: python3 /opt/run.py
 
 volumes:
