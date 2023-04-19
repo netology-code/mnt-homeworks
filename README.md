@@ -10,25 +10,31 @@
 
 ## Блок 8. Система управления конфигурациями
 
-8.1. [Введение в Ansible](./08-ansible-01-base/README.md)
+8.1. [Введение в Ansible](https://github.com/netology-code/mnt-homeworks/tree/MNT-7/08-ansible-01-base)
 
-8.2. [Работа с Playbook](./08-ansible-02-playbook/README.md)
+8.2. [Работа с Playbook](https://github.com/netology-code/mnt-homeworks/tree/MNT-7/08-ansible-02-playbook)
 
-8.3. [Работа с Roles](./08-ansible-03-role/README.md)
+8.3. [Использование YandexCloud](https://github.com/netology-code/mnt-homeworks/tree/MNT-7/08-ansible-03-yandex)
 
-8.4. [Создание собственных модулей](./08-ansible-04-module/README.md)
+8.4. [Работа с Roles](https://github.com/netology-code/mnt-homeworks/tree/MNT-7/08-ansible-04-role)
+
+8.5. [Тестирование Roles](https://github.com/netology-code/mnt-homeworks/tree/MNT-7/08-ansible-05-testing)
+
+8.6. [Создание собственных модулей](https://github.com/netology-code/mnt-homeworks/tree/MNT-7/08-ansible-06-module)
 
 ## Блок 9. Непрерывная разработка и интеграция
 
 9.1. [Жизненный цикл ПО](./09-ci-01-intro/README.md)
 
-9.2. [Процессы CI/CD](./09-ci-02-cicd/README.md)
+9.2. [DevOps и SRE](./09-ci-02-devops/README.md)
 
-9.3. [Jenkins](./09-ci-03-jenkins/README.md)
+9.3. [Процессы CI/CD](./09-ci-03-cicd/README.md)
 
-9.4. [Teamcity](./09-ci-04-teamcity/README.md)
+9.4. [Jenkins](./09-ci-04-jenkins/README.md)
 
-9.5. [Gitlab](./09-ci-05-gitlab/README.md)
+9.5. [Teamcity](./09-ci-05-teamcity/README.md)
+
+9.6. [Gitlab](./09-ci-06-gitlab/README.md)
 
 ## Блок 10. Системы мониторинга
 

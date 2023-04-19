@@ -1,0 +1,5 @@
+sonar_version: 9.1.0.47736
+sonar_download_url: "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-{{ sonar_version }}.zip"
+sonar_version_directory: "sonarqube-{{ sonar_version }}"
+sonar_db_port: "5432"
+sonar_web_context: ''

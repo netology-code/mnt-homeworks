@@ -1,0 +1,382 @@
+---
+- name: Get OpenJDK installed
+  hosts: sonarqube
+  pre_tasks:
+    - name: install unzip
+      become: true
+      yum:
+        name: unzip
+        state: present
+  tasks:
+    - name: Upload .tar.gz file conaining binaries from remote storage
+      get_url:
+        url: "{{ jdk_url }}"
+        dest: "/tmp/jdk-{{ jdk_distr_name }}"
+        mode: 0755
+      register: download_java_remote_binaries
+      until: download_java_remote_binaries is succeeded
+
+    - name: Ensure installation dir exists
+      become: true
+      file:
+        state: directory
+        path: "{{ java_home }}"
+        mode: 0755
+
+    - name: Extract java in the installation directory
+      become: true
+      unarchive:
+        copy: false
+        src: "/tmp/jdk-{{ jdk_distr_name }}"
+        dest: "{{ java_home }}"
+        extra_opts: [--strip-components=1]
+        creates: "{{ java_home }}/bin/java"
+
+    - name: Export environment variables
+      become: true
+      template:
+        src: jdk.sh.j2
+        dest: /etc/profile.d/jdk.sh
+        owner: root
+        group: root
+        mode: 0644
+
+- name: Get PostgreSQL installed
+  hosts: postgres
+  become: true
+  tasks:
+    - name: Change repo file
+      copy:
+        src: CentOS-Base.repo
+        dest: /etc/yum.repos.d/CentOS-Base.repo
+        mode: 0644
+        owner: root
+        group: root
+
+    - name: Install PostgreSQL repos
+      yum:
+        name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+        state: present
+        validate_certs: false
+
+    - name: Install PostgreSQL
+      yum:
+        name: "postgresql{{ postgresql_version }}-server"
+        state: present
+
+    - name: Init template1 DB
+      command: /usr/pgsql-11/bin/postgresql-11-setup initdb
+      failed_when: false
+
+    - name: Start pgsql service
+      systemd:
+        name: "postgresql-{{ postgresql_version }}"
+        state: started
+        enabled: true
+
+    - name: Create user in system
+      user:
+        name: "{{ sonarqube_db_user }}"
+    - name: Create user for Sonar in PostgreSQL
+      become_user: postgres
+      command: "createuser -s -e {{ sonarqube_db_user }}"
+      failed_when: false
+
+    - name: Change password for Sonar user in PostgreSQL
+      become_user: postgres
+      command: "psql -c \"ALTER USER sonar WITH ENCRYPTED password '{{ sonarqube_db_password }}';\""
+
+    - name: Create Sonar DB
+      become_user: postgres
+      command: "createdb {{ sonarqube_db_name }}"
+      failed_when: false
+
+    - name: Copy pg_hba.conf
+      copy:
+        src: pg_hba.conf
+        dest: /var/lib/pgsql/11/data/pg_hba.conf
+        mode: 0600
+        owner: postgres
+        group: postgres
+
+- name: Prepare Sonar host
+  hosts: sonarqube
+  become: true
+  tasks:
+    - name: Create group in system
+      group:
+        name: "{{ sonarqube_db_user }}"
+        state: present
+
+    - name: Create user in system
+      user:
+        name: "{{ sonarqube_db_user }}"
+        group: "{{ sonarqube_db_user }}"
+
+    - name: "Set up ssh key to access for managed node"
+      authorized_key:
+        user: "{{ sonarqube_db_user }}"
+        state: present
+        key: "{{ lookup('file', 'id_rsa.pub') }}"
+
+    - name: "Allow group to have passwordless sudo"
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^%{{ sonarqube_db_user }}'
+        line: '%{{ sonarqube_db_user }} ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+
+    - name: Increase Virtual Memory
+      lineinfile:
+        dest: /etc/sysctl.conf
+        state: present
+        regexp: '^vm.max_map_count'
+        line: 'vm.max_map_count=262144'
+    - name: Reboot VM
+      reboot:
+
+- name: Get Sonarqube installed
+  hosts: sonarqube
+  vars: 
+    ansible_user: "{{ sonarqube_db_user }}"
+  tasks:
+    - name: Get distrib ZIP
+      get_url:
+        url: "{{ sonar_download_url }}"
+        dest: "/tmp/{{ sonar_version_directory }}.zip"
+        validate_certs: false
+
+    - name: Unzip Sonar
+      become: true
+      unarchive:
+        src: "/tmp/{{ sonar_version_directory }}.zip"
+        dest: /usr/local/
+        copy: false
+        owner: "{{ sonarqube_db_user }}"
+        group: "{{ sonarqube_db_user }}"
+        creates: /usr/local/sonar/COPYING
+
+    - name: Move Sonar into place.
+      become: true
+      copy:
+        src: /usr/local/{{ sonar_version_directory }}/
+        dest: /usr/local/sonar/
+        owner: "{{ sonarqube_db_user }}"
+        group: "{{ sonarqube_db_user }}"
+        remote_src: true
+
+    - name: Configure SonarQube JDBC settings for PostgreSQL.
+      lineinfile:
+        dest: /usr/local/sonar/conf/sonar.properties
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - regexp: "^sonar.jdbc.username"
+          line: "sonar.jdbc.username={{ sonarqube_db_user }}"
+        - regexp: "^sonar.jdbc.password"
+          line: "sonar.jdbc.password={{ sonarqube_db_password }}"
+        - regexp: "^sonar.jdbc.url"
+          line: "sonar.jdbc.url=jdbc:postgresql://localhost:{{ sonar_db_port }}/{{ sonarqube_db_name }}?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance"
+        - regexp: "^sonar.web.context"
+          line: "sonar.web.context={{ sonar_web_context }}"
+    
+    - name: Generate wrapper.conf
+      template:
+        src: wrapper.conf.j2
+        dest: /usr/local/sonar/conf/wrapper.conf
+        mode: 0644
+
+    - name: Symlink sonar bin.
+      become: true
+      file:
+        src: /usr/local/sonar/bin/linux-x86-64/sonar.sh
+        dest: /usr/bin/sonar
+        state: link
+      register: sonar_symlink
+
+    - name: Copy SonarQube systemd unit file into place (for systemd systems).
+      become: true
+      template:
+        src: sonar.unit.j2
+        dest: /etc/systemd/system/sonar.service
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Ensure Sonar is running and set to start on boot.
+      become: true
+      service:
+        name: sonar
+        state: restarted
+        enabled: true
+
+    - name: Allow Sonar time to build on first start.
+      pause:
+        seconds: 180
+      when: sonar_symlink.changed
+      tags: ['skip_ansible_lint']
+
+    - name: Make sure Sonar is responding on the configured port.
+      wait_for:
+        port: 9000
+        delay: 3
+        timeout: 300
+- name: Get Nexus installed
+  hosts: nexus
+  pre_tasks:
+    - name: Create Nexus group
+      become: true
+      group:
+        name: "{{ nexus_user_group }}"
+        state: present
+    - name: Create Nexus user
+      become: true
+      user:
+        name: "{{ nexus_user_name }}"
+    - name: Install JDK
+      become: true
+      package:
+        name: [java-1.8.0-openjdk, java-1.8.0-openjdk-devel]
+        state: present
+  tasks:
+    - name: Create Nexus directories
+      become: true
+      file:
+        group: "{{ nexus_user_group }}"
+        owner: "{{ nexus_user_name }}"
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ nexus_directory_log }}"
+        - "{{ nexus_directory_data }}"
+        - "{{ nexus_directory_data }}/etc"
+        - "{{ nexus_directory_package }}"
+        - "{{ nexus_directory_tmp }}"
+
+    - name: Download Nexus
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      get_url:
+        dest: "{{ nexus_directory_package }}/nexus-{{ nexus_version }}.tar.gz"
+        url: "{{ nexus_download_url }}/nexus-{{ nexus_version }}-unix.tar.gz"
+        validate_certs: false
+
+    - name: Unpack Nexus
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      unarchive:
+        copy: no
+        creates: "{{ nexus_directory_package }}/nexus-{{ nexus_version }}"
+        dest: "{{ nexus_directory_package }}"
+        src: "{{ nexus_directory_package }}/nexus-{{ nexus_version }}.tar.gz"
+
+    - name: Link to Nexus Directory
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      file:
+        dest: "{{ nexus_directory_home }}"
+        src: "{{ nexus_directory_package }}/nexus-{{ nexus_version }}"
+        state: link
+
+    - name: Add NEXUS_HOME for Nexus user
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      lineinfile:
+        create: yes
+        dest: "/home/{{ nexus_user_name }}/.bashrc"
+        insertafter: EOF
+        line: "export NEXUS_HOME={{ nexus_directory_home }}"
+
+    - name: Add run_as_user to Nexus.rc
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      lineinfile:
+        create: yes
+        dest: "{{ nexus_directory_home }}/bin/nexus.rc"
+        insertafter: EOF
+        line: "run_as_user=\"{{ nexus_user_name }}\""
+        regexp: "^run_as_user"
+
+    - name: Raise nofile limit for Nexus user
+      become: true
+      pam_limits:
+        domain: "{{ nexus_user_name }}"
+        limit_type: "-"
+        limit_item: nofile
+        value: "{{ nexus_ulimit }}"
+
+    - name: Create Nexus service for SystemD
+      become: true
+      template:
+        dest: /lib/systemd/system/nexus.service
+        mode: 0644
+        src: nexus.systemd.j2
+
+    - name: Ensure Nexus service is enabled for SystemD
+      become: true
+      systemd:
+        daemon_reload: yes
+        enabled: yes
+        name: nexus
+      when:
+        - nexus_service_enabled
+
+    - name: Create Nexus vmoptions
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      template:
+        dest: "{{ nexus_directory_home }}/bin/nexus.vmoptions"
+        src: nexus.vmoptions.j2
+      register: nexus_config_changed
+
+    - name: Create Nexus properties
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      template:
+        dest: "{{ nexus_directory_data }}/etc/nexus.properties"
+        src: nexus.properties.j2
+      register: nexus_config_changed
+
+    - name: Lower Nexus disk space threshold
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      lineinfile:
+        backrefs: yes
+        dest: "{{ nexus_directory_home }}/etc/karaf/system.properties"
+        insertafter: EOF
+        line: "storage.diskCache.diskFreeSpaceLimit={{ nexus_configuration_disk_free_space_limit }}"
+        regexp: ^storage\.diskCache\.diskFreeSpaceLimit
+      when: nexus_configuration_disk_free_space_limit is not none
+      register: nexus_config_changed
+
+    - name: Start Nexus service if enabled
+      become: true
+      service:
+        enabled: yes
+        name: nexus
+        state: started
+      when:
+        - nexus_service_start_on_boot
+        - not nexus_config_changed.changed
+      tags:
+        - skip_ansible_lint
+
+    - name: Ensure Nexus service is restarted
+      become: true
+      service:
+        name: nexus
+        state: restarted
+      when:
+        - nexus_service_start_on_boot
+        - nexus_config_changed.changed
+      tags:
+        - skip_ansible_lint
+
+    - name: Wait for Nexus port if started
+      wait_for:
+        port: "{{ nexus_port }}"
+        state: started
+        timeout: "{{ nexus_port_check_timeout }}"
+      when:
+        - nexus_service_start_on_boot

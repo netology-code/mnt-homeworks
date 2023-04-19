@@ -1,0 +1,158 @@
+---
+- name: Get Nexus installed
+  hosts: nexus
+  pre_tasks:
+    - name: Create Nexus group
+      become: true
+      group:
+        name: "{{ nexus_user_group }}"
+        state: present
+    - name: Create Nexus user
+      become: true
+      user:
+        name: "{{ nexus_user_name }}"
+    - name: Install JDK
+      become: true
+      package:
+        name: [java-1.8.0-openjdk, java-1.8.0-openjdk-devel]
+        state: present
+  tasks:
+    - name: Create Nexus directories
+      become: true
+      file:
+        group: "{{ nexus_user_group }}"
+        owner: "{{ nexus_user_name }}"
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ nexus_directory_log }}"
+        - "{{ nexus_directory_data }}"
+        - "{{ nexus_directory_data }}/etc"
+        - "{{ nexus_directory_package }}"
+        - "{{ nexus_directory_tmp }}"
+
+    - name: Download Nexus
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      get_url:
+        dest: "{{ nexus_directory_package }}/nexus-{{ nexus_version }}.tar.gz"
+        url: "{{ nexus_download_url }}/nexus-{{ nexus_version }}-unix.tar.gz"
+
+    - name: Unpack Nexus
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      unarchive:
+        copy: no
+        creates: "{{ nexus_directory_package }}/nexus-{{ nexus_version }}"
+        dest: "{{ nexus_directory_package }}"
+        src: "{{ nexus_directory_package }}/nexus-{{ nexus_version }}.tar.gz"
+
+    - name: Link to Nexus Directory
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      file:
+        dest: "{{ nexus_directory_home }}"
+        src: "{{ nexus_directory_package }}/nexus-{{ nexus_version }}"
+        state: link
+
+    - name: Add NEXUS_HOME for Nexus user
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      lineinfile:
+        create: yes
+        dest: "/home/{{ nexus_user_name }}/.bashrc"
+        insertafter: EOF
+        line: "export NEXUS_HOME={{ nexus_directory_home }}"
+
+    - name: Add run_as_user to Nexus.rc
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      lineinfile:
+        create: yes
+        dest: "{{ nexus_directory_home }}/bin/nexus.rc"
+        insertafter: EOF
+        line: "run_as_user=\"{{ nexus_user_name }}\""
+        regexp: "^run_as_user"
+
+    - name: Raise nofile limit for Nexus user
+      become: true
+      pam_limits:
+        domain: "{{ nexus_user_name }}"
+        limit_type: "-"
+        limit_item: nofile
+        value: "{{ nexus_ulimit }}"
+
+    - name: Create Nexus service for SystemD
+      become: true
+      template:
+        dest: /lib/systemd/system/nexus.service
+        mode: 0644
+        src: nexus.systemd.j2
+
+    - name: Ensure Nexus service is enabled for SystemD
+      become: true
+      systemd:
+        daemon_reload: yes
+        enabled: yes
+        name: nexus
+      when:
+        - nexus_service_enabled
+
+    - name: Create Nexus vmoptions
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      template:
+        dest: "{{ nexus_directory_home }}/bin/nexus.vmoptions"
+        src: nexus.vmoptions.j2
+      register: nexus_config_changed
+
+    - name: Create Nexus properties
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      template:
+        dest: "{{ nexus_directory_data }}/etc/nexus.properties"
+        src: nexus.properties.j2
+      register: nexus_config_changed
+
+    - name: Lower Nexus disk space threshold
+      become: true
+      become_user: "{{ nexus_user_name }}"
+      lineinfile:
+        backrefs: yes
+        dest: "{{ nexus_directory_home }}/etc/karaf/system.properties"
+        insertafter: EOF
+        line: "storage.diskCache.diskFreeSpaceLimit={{ nexus_configuration_disk_free_space_limit }}"
+        regexp: ^storage\.diskCache\.diskFreeSpaceLimit
+      when: nexus_configuration_disk_free_space_limit is not none
+      register: nexus_config_changed
+
+    - name: Start Nexus service if enabled
+      become: true
+      service:
+        enabled: yes
+        name: nexus
+        state: started
+      when:
+        - nexus_service_start_on_boot
+        - not nexus_config_changed.changed
+      tags:
+        - skip_ansible_lint
+
+    - name: Ensure Nexus service is restarted
+      become: true
+      service:
+        name: nexus
+        state: restarted
+      when:
+        - nexus_service_start_on_boot
+        - nexus_config_changed.changed
+      tags:
+        - skip_ansible_lint
+
+    - name: Wait for Nexus port if started
+      wait_for:
+        port: "{{ nexus_port }}"
+        state: started
+        timeout: "{{ nexus_port_check_timeout }}"
+      when:
+        - nexus_service_start_on_boot
