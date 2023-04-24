@@ -326,7 +326,7 @@ root@debian:~/my-ansible-6$
 
 ### 12. Заполните всю документацию по collection, выложите в свой репозиторий, поставьте тег `1.0.0` на этот коммит.
 
-Ссылка на репозиторий версии **1.0.0**: [Ansible-Collection](https://github.com/NamorNinayzuk/ansible-collection/tree/1.0.0)
+Ссылка на репозиторий версии **1.0.0**: [Ansible-Collection](https://github.com/NamorNinayzuk/ansible-collection)
 
 ---
 
