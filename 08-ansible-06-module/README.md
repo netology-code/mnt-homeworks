@@ -106,7 +106,7 @@ root@debian:~/my-ansible-6/ansible$
 ```json
 {
     "ANSIBLE_MODULE_ARGS": {
-        "path": "test23",
+        "path": "test123",
         "content": "test line"
     }
 }
@@ -118,7 +118,7 @@ root@debian:~/my-ansible-6/ansible$
 ```console
 (venv) root@debian:~/my-ansible-6/ansible$ python -m ansible.modules.file_content payload.json
 
-{"changed": true, "path": "test23", "content": "test line", "status": "created", "uid": 1000, "gid": 1000, "owner": "sa", "group": "sa", "mode": "0644", "state": "file", "size": 9, "invocation": {"module_args": {"path": "test23", "content": "test line"}}}
+{"changed": true, "path": "test123", "content": "test line", "status": "created", "uid": 1000, "gid": 1000, "owner": "sa", "group": "sa", "mode": "0644", "state": "file", "size": 9, "invocation": {"module_args": {"path": "test123", "content": "test line"}}}
 (venv) root@debian:~/my-ansible-6/ansible$
 ```
 
@@ -126,7 +126,7 @@ root@debian:~/my-ansible-6/ansible$
 ```json
 {
     "changed": true,
-    "path": "test23",
+    "path": "test123",
     "content": "test line",
     "status": "created",
     "uid": 1000,
@@ -138,7 +138,7 @@ root@debian:~/my-ansible-6/ansible$
     "size": 9,
     "invocation": {
         "module_args": {
-            "path": "test23",
+            "path": "test123",
             "content": "test line"
         }
     }
@@ -149,7 +149,7 @@ root@debian:~/my-ansible-6/ansible$
 ```console
 (venv) root@debian:~/my-ansible-6/ansible$ python -m ansible.modules.file_content payload.json
 
-{"changed": false, "path": "test23", "content": "test line", "status": "resisted", "uid": 1000, "gid": 1000, "owner": "sa", "group": "sa", "mode": "0644", "state": "file", "size": 9, "invocation": {"module_args": {"path": "test23", "content": "test line"}}}
+{"changed": false, "path": "test123", "content": "test line", "status": "resisted", "uid": 1000, "gid": 1000, "owner": "sa", "group": "sa", "mode": "0644", "state": "file", "size": 9, "invocation": {"module_args": {"path": "test123", "content": "test line"}}}
 (venv) root@debian:~/my-ansible-6/ansible$
 ```
 
@@ -157,7 +157,7 @@ root@debian:~/my-ansible-6/ansible$
 ```json
 {
     "changed": false,
-    "path": "test23",
+    "path": "test123",
     "content": "test line",
     "status": "resisted",
     "uid": 1000,
@@ -169,7 +169,7 @@ root@debian:~/my-ansible-6/ansible$
     "size": 9,
     "invocation": {
         "module_args": {
-            "path": "test23",
+            "path": "test123",
             "content": "test line"
         }
     }
@@ -180,7 +180,7 @@ root@debian:~/my-ansible-6/ansible$
 ```console
 (venv) root@debian:~/my-ansible-6/ansible$ python -m ansible.modules.file_content payload.json
 
-{"changed": true, "path": "test23", "content": "test line +add", "status": "modified", "uid": 1000, "gid": 1000, "owner": "sa", "group": "sa", "mode": "0644", "state": "file", "size": 14, "invocation": {"module_args": {"path": "test23", "content": "test line +add"}}}
+{"changed": true, "path": "test123", "content": "test line +add", "status": "modified", "uid": 1000, "gid": 1000, "owner": "sa", "group": "sa", "mode": "0644", "state": "file", "size": 14, "invocation": {"module_args": {"path": "test123", "content": "test line +add"}}}
 (venv) root@debian:~/my-ansible-6/ansible$
 ```
 
@@ -188,7 +188,7 @@ root@debian:~/my-ansible-6/ansible$
 ```json
 {
     "changed": true,
-    "path": "test23",
+    "path": "test123",
     "content": "test line +add",
     "status": "modified",
     "uid": 1000,
@@ -200,7 +200,7 @@ root@debian:~/my-ansible-6/ansible$
     "size": 14,
     "invocation": {
         "module_args": {
-            "path": "test23",
+            "path": "test123",
             "content": "test line +add"
         }
     }
@@ -221,14 +221,14 @@ root@debian:~/my-ansible-6/ansible$
 - name: Test module
   hosts: localhost
   tasks:
-    - name: run on test23
+    - name: run on test123
       file_content:
-        path: 'test23'
+        path: 'test123'
         content: 'write test'
 ...
 ```
 
-Исполнение **playbook**: (файла **test23** нет)
+Исполнение **playbook**: (файла **test123** нет)
 ```console
 (venv) root@debian:~/my-ansible-6/ansible$ ansible-playbook site.yml
 [WARNING]: You are running the development version of Ansible. You should only run Ansible from "devel" if you are
@@ -243,7 +243,7 @@ PLAY [Test module] *************************************************************
 TASK [Gathering Facts] *************************************************************************************************
 ok: [localhost]
 
-TASK [run on test23 - write] *******************************************************************************************
+TASK [run on test123 - write] *******************************************************************************************
 changed: [localhost]
 
 PLAY RECAP *************************************************************************************************************
@@ -256,7 +256,7 @@ localhost                  : ok=2    changed=1    unreachable=0    failed=0    s
 
 ### 6. Проверьте через playbook на идемпотентность.
 
-Повторный запуск **playbook** (файл **test23** уже существует):
+Повторный запуск **playbook** (файл **test123** уже существует):
 ```console
 (venv) root@debian:~/my-ansible-6/ansible$ ansible-playbook site.yml
 [WARNING]: You are running the development version of Ansible. You should only run Ansible from "devel" if you are
@@ -271,7 +271,7 @@ PLAY [Test module] *************************************************************
 TASK [Gathering Facts] *************************************************************************************************
 ok: [localhost]
 
-TASK [run on test23 - write] *******************************************************************************************
+TASK [run on test123 - write] *******************************************************************************************
 ok: [localhost]
 
 PLAY RECAP *************************************************************************************************************
@@ -292,14 +292,14 @@ localhost                  : ok=2    changed=0    unreachable=0    failed=0    s
 
 Инициализация новой **collection** выполняется по шаблону `ansible-galaxy collection init <пространство>.<коллекция>`, где `<пространство>` - Пространство имён автора (название группы для всех **collection** автора), `<коллекция>` - название **collection**
 
-Создание своей **collection** (вместо `my_own_namespace.yandex_cloud_elk` используется `artem_shtepa.utils`):
+Создание своей **collection** (вместо `my_own_namespace.yandex_cloud_elk` используется `test.utils`):
 
 ```console
-root@debian:~/my-ansible-6$ ansible-galaxy collection init artem_shtepa.utils
+root@debian:~/my-ansible-6$ ansible-galaxy collection init test.utils
 [WARNING]: You are running the development version of Ansible. You should only run Ansible from "devel" if you are
 modifying the Ansible engine, or trying out features under development. This is a rapidly changing source of code and
 can become unstable at any point.
-- Collection artem_shtepa.utils was created successfully
+- Collection test.utils was created successfully
 root@debian:~/my-ansible-6$
 ```
 
@@ -335,12 +335,12 @@ root@debian:~/my-ansible-6$
 Архив **collection** создаётся командой `ansible-galaxy collection build`
 
 ```console
-root@debian:~/my-ansible-6/artem_shtepa/utils$ ansible-galaxy collection build
+root@debian:~/my-ansible-6/utils$ ansible-galaxy collection build
 [WARNING]: You are running the development version of Ansible. You should only run Ansible from "devel" if you are
 modifying the Ansible engine, or trying out features under development. This is a rapidly changing source of code and
 can become unstable at any point.
-Created collection for artem_shtepa.utils at /home/my-ansible-6/artem_shtepa/utils/artem_shtepa-utils-1.0.0.tar.gz
-root@debian:~/my-ansible-6/artem_shtepa/utils$
+Created collection for test.utils at /home/my-ansible-6/utils/test-utils-1.0.0.tar.gz
+root@debian:~/my-ansible-6/utils$
 ```
 
 ---
@@ -349,7 +349,7 @@ root@debian:~/my-ansible-6/artem_shtepa/utils$
 
 ```console
 root@debian:~/my-ansible-6/final_test$ ls
-artem_shtepa-utils-1.0.0.tar.gz  test_file_content.yml
+test-utils-1.0.0.tar.gz  test_file_content.yml
 root@debian:~/my-ansible-6/final_test$
 ```
 
@@ -361,15 +361,15 @@ root@debian:~/my-ansible-6/final_test$
 Если запрашиваемая версия уже установлена, но требуется её заменить нужно добавить ключ: `--force`
 
 ```console
-root@debian:~/my-ansible-6/final_test$ ansible-galaxy collection install artem_shtepa-utils-1.0.0.tar.gz
+root@debian:~/my-ansible-6/final_test$ ansible-galaxy collection install test-utils-1.0.0.tar.gz
 [WARNING]: You are running the development version of Ansible. You should only run Ansible from "devel" if you are
 modifying the Ansible engine, or trying out features under development. This is a rapidly changing source of code and
 can become unstable at any point.
 Starting galaxy collection install process
 Process install dependency map
 Starting collection install process
-Installing 'artem_shtepa.utils:1.0.0' to '/home/.ansible/collections/ansible_collections/artem_shtepa/utils'
-artem_shtepa.utils:1.0.0 was installed successfully
+Installing 'test.utils:1.0.0' to '/home/.ansible/collections/ansible_collections/utils'
+test.utils:1.0.0 was installed successfully
 root@debian:~/my-ansible-6/final_test$
 ```
 
@@ -391,14 +391,14 @@ PLAY [Test file content role] **************************************************
 TASK [Gathering Facts] *************************************************************************************************
 ok: [localhost]
 
-TASK [artem_shtepa.utils.file_content : Compute file] ******************************************************************
+TASK [test.utils.file_content : Compute file] **************************************************************************
 changed: [localhost]
 
 PLAY RECAP *************************************************************************************************************
 localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 root@debian:~/my-ansible-6/final_test$ ls
-artem_shtepa-utils-1.0.0.tar.gz  test_file  test_file_content.yml
+test-utils-1.0.0.tar.gz  test_file  test_file_content.yml
 root@debian:~/my-ansible-6/final_test$ cat test_file && echo ''
 sequence_of_data
 root@debian:~/my-ansible-6/final_test$
