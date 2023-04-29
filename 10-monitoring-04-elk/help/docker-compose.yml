@@ -74,9 +74,10 @@ services:
       - es-warm
 
   logstash:
-    image: logstash:6.5.1
-
+    image: logstash:8.7.0
     container_name: logstash
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
     ports:
       - 5046:5046
       - 5044:5044
