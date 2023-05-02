@@ -91,7 +91,7 @@ services:
       - es-warm
 
   filebeat:
-    image: elastic/filebeat:7.2.0
+    image: elastic/filebeat:8.7.0
     container_name: filebeat
     privileged: true
     user: root
