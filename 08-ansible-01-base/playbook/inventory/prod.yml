@@ -3,7 +3,3 @@
     hosts:
       centos7:
         ansible_connection: docker
-  deb:
-    hosts:
-      ubuntu:
-        ansible_connection: docker
