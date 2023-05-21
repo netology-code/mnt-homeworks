@@ -117,8 +117,9 @@
       authorized_key:
         user: "{{ sonarqube_db_user }}"
         state: present
-        key: "{{ lookup('file', 'id_rsa.pub') }}"
-
+        #key: "{{ lookup('file', 'id_rsa.pub') }}"
+         key: "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}"
+         
     - name: "Allow group to have passwordless sudo"
       lineinfile:
         dest: /etc/sudoers
