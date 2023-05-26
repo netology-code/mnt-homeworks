@@ -237,7 +237,7 @@ INFO: ------------------------------------------------------------------------
 └─$ 
 ```
 
-![sonarqube](image/sonarqube.png)
+![sonarqube](images/sonarqube.png)
 
 ## Знакомство с Nexus
 
@@ -253,7 +253,7 @@ INFO: ------------------------------------------------------------------------
 > 3. Проверяем, что все файлы загрузились успешно
 > 4. В ответе присылаем файл `maven-metadata.xml` для этого артефекта
 
-![nexus](image/nexus.png)
+![nexus](images/nexus.png)
 
 Метаданные артефакта: [maven-metadata.xml](mvn/maven-metadata.xml)
 
