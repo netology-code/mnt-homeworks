@@ -424,8 +424,8 @@ localhost                  : ok=4    changed=0    unreachable=0    failed=0    s
 +----------------------+-------------------+---------------+---------+-----------------+-------------+
 |          ID          |       NAME        |    ZONE ID    | STATUS  |   EXTERNAL IP   | INTERNAL IP |
 +----------------------+-------------------+---------------+---------+-----------------+-------------+
-| fhm90et921n53rnjgpks | jenkins-master-01 | ru-central1-a | RUNNING | 51.250.17.146 | 10.2.0.26   |
-| fhml6hg70ruicnjjpegm | jenkins-agent-01  | ru-central1-a | RUNNING | 51.250.3.1  | 10.2.0.10   |
+| fhm90et921n53rnjgpks | jenkins-master-01 | ru-central1-a | RUNNING | 51.250.17.146   | 10.2.0.26   |
+| fhml6hg70ruicnjjpegm | jenkins-agent-01  | ru-central1-a | RUNNING | 51.250.3.1      | 10.2.0.10   |
 +----------------------+-------------------+---------------+---------+-----------------+-------------+
 
 ┌──(kali㉿kali)-[~/09-ci-04jenkins]
