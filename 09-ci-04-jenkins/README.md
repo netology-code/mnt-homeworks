@@ -10,10 +10,10 @@
 Работа выполнялась в **Яндекс.Облаке**, поэтому использовался [Интерфейс командной строки Yandex Cloud](https://cloud.yandex.ru/docs/cli/quickstart)
 
 Разворачивание ВМ выполнялось провайдером **Яндекс.Облака** для **terraform** с его [зеркала](https://cloud.yandex.ru/docs/tutorials/infrastructure-management/terraform-quickstart#install-terraform).
-Готовые файлы инфраструктуры: основной [main.tf](09-ci-04-jenkins/infrastructure/cicd/hosts.yml) и модуль [vm-instance](09-ci-04-jenkins/infrastructure/vm-instance/main.tf) (содержит прямую ссылку на открытый ключ)
+Готовые файлы инфраструктуры: основной [main.tf](infrastructure/main.tf) и модуль [vm-instance](infrastructure/vm-instance/main.tf) (содержит прямую ссылку на открытый ключ)
 
 
-Разворачивание **Jenkins** и его агента выполняется через **ansible**: [основной playbook](09-ci-04-jenkins/infrastructure/site.yml), [структура нод](09-ci-04-jenkins/infrastructure/cicd/hosts.yml) и [переменные](09-ci-04-jenkins/infrastructure/cicd/group_vars/jenkins.yml)
+Разворачивание **Jenkins** и его агента выполняется через **ansible**: [основной playbook](infrastructure/site.yml), [структура нод](infrastructure/cicd/hosts.yml) и [переменные](infrastructure/cicd/group_vars/jenkins.yml)
 
 Все необходимое для развертки в **bash** скрипте: [go.sh](go.sh)
 
@@ -746,4 +746,15 @@ fatal: [localhost]: FAILED! => {"changed": false, "module_stderr": "sudo: a pass
   - Основная ветка **main** содержит файл `ScriptedCVLstackJenkinsfile` из второй дополнительной задачи
 
 ---
+## Необязательная часть
 
+1. Создать скрипт на groovy, который будет собирать все Job, завершившиеся хотя бы раз неуспешно. Добавить скрипт в репозиторий с решением и названием `AllJobFailure.groovy`.
+2. Создать Scripted Pipeline так, чтобы он мог сначала запустить через Yandex Cloud CLI необходимое количество инстансов, прописать их в инвентори плейбука и после этого запускать плейбук. Мы должны при нажатии кнопки получить готовую к использованию систему.
+
+---
+
+### Как оформить решение задания
+
+Выполненное домашнее задание пришлите в виде ссылки на .md-файл в вашем репозитории.
+
+---
