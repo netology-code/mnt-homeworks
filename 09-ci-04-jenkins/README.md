@@ -245,9 +245,9 @@ Apply complete! Resources: 5 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-master_ip = "178.154.254.197"
+master_ip = "51.250.17.146"
 slave_ip = [
-  "178.154.254.18",
+  "51.250.3.1",
 ]
 ┌──(kali㉿kali)-[~/09-ci-04jenkins]
 └─$  ./go.sh deploy
@@ -261,8 +261,8 @@ TASK [Set instances to facts] **************************************************
 ok: [localhost]
 
 TASK [Add instances IP to hosts] ***************************************************************************************
-ok: [localhost] => (item={'id': 'fhm90et921n53rnjgpks', 'folder_id': 'b1g3ol70h1opu6hr9kie', 'created_at': '2022-10-31T11:22:41Z', 'name': 'jenkins-master-01', 'description': 'Jenkins Master', 'zone_id': 'ru-central1-a', 'platform_id': 'standard-v1', 'resources': {'memory': '2147483648', 'cores': '2', 'core_fraction': '5'}, 'status': 'RUNNING', 'metadata_options': {'gce_http_endpoint': 'ENABLED', 'aws_v1_http_endpoint': 'ENABLED', 'gce_http_token': 'ENABLED', 'aws_v1_http_token': 'ENABLED'}, 'boot_disk': {'mode': 'READ_WRITE', 'device_name': 'centos', 'auto_delete': True, 'disk_id': 'fhm90knlb6e2d1hiqi2a'}, 'network_interfaces': [{'index': '0', 'mac_address': 'd0:0d:90:3b:a9:10', 'subnet_id': 'e9buecm6olupomr0fgv1', 'primary_v4_address': {'address': '10.2.0.26', 'one_to_one_nat': {'address': '178.154.254.197', 'ip_version': 'IPV4'}}}], 'fqdn': 'fhm90et921n53rnjgpks.auto.internal', 'scheduling_policy': {}, 'network_settings': {'type': 'STANDARD'}, 'placement_policy': {}})
-ok: [localhost] => (item={'id': 'fhml6hg70ruicnjjpegm', 'folder_id': 'b1g3ol70h1opu6hr9kie', 'created_at': '2022-10-31T11:22:41Z', 'name': 'jenkins-agent-01', 'description': 'Jenkins Slave Node 1', 'zone_id': 'ru-central1-a', 'platform_id': 'standard-v1', 'resources': {'memory': '4294967296', 'cores': '2', 'core_fraction': '20'}, 'status': 'RUNNING', 'metadata_options': {'gce_http_endpoint': 'ENABLED', 'aws_v1_http_endpoint': 'ENABLED', 'gce_http_token': 'ENABLED', 'aws_v1_http_token': 'ENABLED'}, 'boot_disk': {'mode': 'READ_WRITE', 'device_name': 'centos', 'auto_delete': True, 'disk_id': 'fhmiubt6uodfipkp90v9'}, 'network_interfaces': [{'index': '0', 'mac_address': 'd0:0d:15:34:60:70', 'subnet_id': 'e9buecm6olupomr0fgv1', 'primary_v4_address': {'address': '10.2.0.10', 'one_to_one_nat': {'address': '178.154.254.18', 'ip_version': 'IPV4'}}}], 'fqdn': 'fhml6hg70ruicnjjpegm.auto.internal', 'scheduling_policy': {}, 'network_settings': {'type': 'STANDARD'}, 'placement_policy': {}})
+ok: [localhost] => (item={'id': 'fhm90et921n53rnjgpks', 'folder_id': 'b1g3ol70h1opu6hr9kie', 'created_at': '2023-10-31T11:22:41Z', 'name': 'jenkins-master-01', 'description': 'Jenkins Master', 'zone_id': 'ru-central1-a', 'platform_id': 'standard-v1', 'resources': {'memory': '2147483648', 'cores': '2', 'core_fraction': '5'}, 'status': 'RUNNING', 'metadata_options': {'gce_http_endpoint': 'ENABLED', 'aws_v1_http_endpoint': 'ENABLED', 'gce_http_token': 'ENABLED', 'aws_v1_http_token': 'ENABLED'}, 'boot_disk': {'mode': 'READ_WRITE', 'device_name': 'centos', 'auto_delete': True, 'disk_id': 'fhm90knlb6e2d1hiqi2a'}, 'network_interfaces': [{'index': '0', 'mac_address': 'd0:0d:90:3b:a9:10', 'subnet_id': 'e9buecm6olupomr0fgv1', 'primary_v4_address': {'address': '10.2.0.26', 'one_to_one_nat': {'address': '51.250.17.146', 'ip_version': 'IPV4'}}}], 'fqdn': 'fhm90et921n53rnjgpks.auto.internal', 'scheduling_policy': {}, 'network_settings': {'type': 'STANDARD'}, 'placement_policy': {}})
+ok: [localhost] => (item={'id': 'fhml6hg70ruicnjjpegm', 'folder_id': 'b1g3ol70h1opu6hr9kie', 'created_at': '2023-10-31T11:22:41Z', 'name': 'jenkins-agent-01', 'description': 'Jenkins Slave Node 1', 'zone_id': 'ru-central1-a', 'platform_id': 'standard-v1', 'resources': {'memory': '4294967296', 'cores': '2', 'core_fraction': '20'}, 'status': 'RUNNING', 'metadata_options': {'gce_http_endpoint': 'ENABLED', 'aws_v1_http_endpoint': 'ENABLED', 'gce_http_token': 'ENABLED', 'aws_v1_http_token': 'ENABLED'}, 'boot_disk': {'mode': 'READ_WRITE', 'device_name': 'centos', 'auto_delete': True, 'disk_id': 'fhmiubt6uodfipkp90v9'}, 'network_interfaces': [{'index': '0', 'mac_address': 'd0:0d:15:34:60:70', 'subnet_id': 'e9buecm6olupomr0fgv1', 'primary_v4_address': {'address': '10.2.0.10', 'one_to_one_nat': {'address': '51.250.3.1', 'ip_version': 'IPV4'}}}], 'fqdn': 'fhml6hg70ruicnjjpegm.auto.internal', 'scheduling_policy': {}, 'network_settings': {'type': 'STANDARD'}, 'placement_policy': {}})
 
 TASK [Check instance count] ********************************************************************************************
 ok: [localhost] => {
@@ -344,11 +344,11 @@ TASK [Install Jenkins and requirements] ****************************************
 changed: [jenkins-master-01]
 
 TASK [Ensure jenkins agents are present in known_hosts file] ***********************************************************
-# 178.154.254.18:22 SSH-2.0-OpenSSH_8.0
-# 178.154.254.18:22 SSH-2.0-OpenSSH_8.0
-# 178.154.254.18:22 SSH-2.0-OpenSSH_8.0
-# 178.154.254.18:22 SSH-2.0-OpenSSH_8.0
-# 178.154.254.18:22 SSH-2.0-OpenSSH_8.0
+# 51.250.3.1:22 SSH-2.0-OpenSSH_8.0
+# 51.250.3.1:22 SSH-2.0-OpenSSH_8.0
+# 51.250.3.1:22 SSH-2.0-OpenSSH_8.0
+# 51.250.3.1:22 SSH-2.0-OpenSSH_8.0
+# 51.250.3.1:22 SSH-2.0-OpenSSH_8.0
 changed: [jenkins-master-01] => (item=jenkins-agent-01)
 
 TASK [Start Jenkins] ***************************************************************************************************
@@ -364,7 +364,7 @@ ok: [jenkins-master-01] => {
 
 TASK [Commands to get private key] *************************************************************************************
 ok: [jenkins-master-01] => {
-    "msg": "ssh centos@178.154.254.197 sudo cat /home/jenkins/.ssh/id_rsa"
+    "msg": "ssh centos@51.250.17.146 sudo cat /home/jenkins/.ssh/id_rsa"
 }
 
 PLAY [Prepare jenkins agent] *******************************************************************************************
@@ -413,7 +413,7 @@ changed: [jenkins-agent-01]
 
 TASK [Agent configuration] *********************************************************************************************
 ok: [jenkins-agent-01] => {
-    "msg": "To configure agent node use: ssh 178.154.254.18 java -jar /opt/jenkins_agent/agent.jar"
+    "msg": "To configure agent node use: ssh 51.250.3.1 java -jar /opt/jenkins_agent/agent.jar"
 }
 
 PLAY RECAP *************************************************************************************************************
@@ -424,8 +424,8 @@ localhost                  : ok=4    changed=0    unreachable=0    failed=0    s
 +----------------------+-------------------+---------------+---------+-----------------+-------------+
 |          ID          |       NAME        |    ZONE ID    | STATUS  |   EXTERNAL IP   | INTERNAL IP |
 +----------------------+-------------------+---------------+---------+-----------------+-------------+
-| fhm90et921n53rnjgpks | jenkins-master-01 | ru-central1-a | RUNNING | 178.154.254.197 | 10.2.0.26   |
-| fhml6hg70ruicnjjpegm | jenkins-agent-01  | ru-central1-a | RUNNING | 178.154.254.18  | 10.2.0.10   |
+| fhm90et921n53rnjgpks | jenkins-master-01 | ru-central1-a | RUNNING | 51.250.17.146 | 10.2.0.26   |
+| fhml6hg70ruicnjjpegm | jenkins-agent-01  | ru-central1-a | RUNNING | 51.250.3.1  | 10.2.0.10   |
 +----------------------+-------------------+---------------+---------+-----------------+-------------+
 
 ┌──(kali㉿kali)-[~/09-ci-04jenkins]
@@ -489,7 +489,7 @@ pipeline {
 > Данное поведение, я, к сожалению, проверить не догадался.
 > В данном решении файлы `Jenkinsfile` разные из-за наличия в них маркеров (первый шаг) - без них файл можно было бы сделать единым для всех веток.
 
-Для проверки решения в имеющемся репозиторий **CVL-stack** создан файл `Jenkinsfile` со следующим содержимым:
+Для проверки решения в имеющемся репозиторий **JeMoVeClLi** создан файл `Jenkinsfile` со следующим содержимым:
 
 ```jenkins
 pipeline {
@@ -564,7 +564,7 @@ pipeline {
 
 ```console
 Started
-[Mon Oct 31 15:15:43 UTC 2022] Starting branch indexing...
+[Wed May 31 15:15:43 UTC 2023] Starting branch indexing...
  > git --version # timeout=10
  > git --version # 'git version 2.31.1'
 using GIT_SSH to set credentials 
@@ -606,7 +606,7 @@ Scheduled build for branch: main
     Met criteria
 Scheduled build for branch: second
 Processed 2 branches
-[Mon Oct 31 15:15:52 UTC 2022] Finished branch indexing. Indexing took 8.6 sec
+[Wed May 31 15:15:52 UTC 2023] Finished branch indexing. Indexing took 8.6 sec
 Finished: SUCCESS
 ```
 
@@ -726,7 +726,7 @@ fatal: [localhost]: FAILED! => {"changed": false, "module_stderr": "sudo: a pass
 Проблему можно решить разными способами - подробнее в статье [Ansible – “sudo: a password is required”](https://www.shellhacks.com/ansible-sudo-a-password-is-required/)
 
 Я выбрал вариант попроще, а именно - не спрашивать пароль для `sudo` операций пользователя `jenkins` для чего нужно:
-  - Подключиться к ноде агента: `ssh centos@178.154.254.18`
+  - Подключиться к ноде агента: `ssh centos@51.250.3.1`
   - Выполнить команду `sudo visudo`
   - Добавить в конец файла строку `jenkins  ALL=(ALL) NOPASSWD:ALL`
 
@@ -738,7 +738,7 @@ fatal: [localhost]: FAILED! => {"changed": false, "module_stderr": "sudo: a pass
 
 ### 8. Отправить ссылку на репозиторий с ролью и Declarative Pipeline и Scripted Pipeline.
 
-Репозиторий решения: [CVL-stack](https://github.com/NamorNinayzuk/JeMoVeClLi) - содержит:
+Репозиторий решения: [JeMoVeClLi](https://github.com/NamorNinayzuk/JeMoVeClLi) - содержит:
   - Сценарий проверки ролей стека **Clickhouse+Vector+Lighthouse**
   - Две ветки для **Multibranch pipeline**: `main` и `second` - используется файл **Jenkinsfile**
   - Основная ветка **main** содержит Файл `DeclarativeJenkinsfile` для **Declarative pipeline**
@@ -746,3 +746,4 @@ fatal: [localhost]: FAILED! => {"changed": false, "module_stderr": "sudo: a pass
   - Основная ветка **main** содержит файл `ScriptedCVLstackJenkinsfile` из второй дополнительной задачи
 
 ---
+
