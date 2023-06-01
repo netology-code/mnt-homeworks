@@ -10,10 +10,10 @@
 Работа выполнялась в **Яндекс.Облаке**, поэтому использовался [Интерфейс командной строки Yandex Cloud](https://cloud.yandex.ru/docs/cli/quickstart)
 
 Разворачивание ВМ выполнялось провайдером **Яндекс.Облака** для **terraform** с его [зеркала](https://cloud.yandex.ru/docs/tutorials/infrastructure-management/terraform-quickstart#install-terraform).
-Готовые файлы инфраструктуры: основной [main.tf](infrastructure/main.tf) и модуль [vm-instance](infrastructure/vm-instance/main.tf) (содержит прямую ссылку на открытый ключ)
+Готовые файлы инфраструктуры: основной [main.tf](09-ci-04-jenkins/infrastructure/cicd/hosts.yml) и модуль [vm-instance](09-ci-04-jenkins/infrastructure/vm-instance/main.tf) (содержит прямую ссылку на открытый ключ)
 
 
-Разворачивание **Jenkins** и его агента выполняется через **ansible**: [основной playbook](infrastructure/site.yml), [структура нод](infrastructure/cicd/hosts.yml) и [переменные](infrastructure/cicd/group_vars/jenkins.yml)
+Разворачивание **Jenkins** и его агента выполняется через **ansible**: [основной playbook](09-ci-04-jenkins/infrastructure/site.yml), [структура нод](09-ci-04-jenkins/infrastructure/cicd/hosts.yml) и [переменные](09-ci-04-jenkins/infrastructure/cicd/group_vars/jenkins.yml)
 
 Все необходимое для развертки в **bash** скрипте: [go.sh](go.sh)
 
