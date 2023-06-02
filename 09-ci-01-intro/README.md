@@ -26,7 +26,7 @@
 Перейти в scrum, запланировать новый спринт, состоящий из задач эпика и одного бага, стартовать спринт, провести задачи до состояния Closed. Закрыть спринт.
 
 ---
-[kanban](https://b24-gu7ntr.bitrix24.ru/workgroups/group/2/tasks/ "BtrX")
+[kanban](https://github.com/NamorNinayzuk/mnt-homeworks/blob/MNT-video/09-ci-01-intro/Workflow%20Bugs.xml) "")
 ---
 ---
 [scrum](https://b24-gu7ntr.bitrix24.ru/workgroups/group/4/tasks/?scrum=Y&tab=plan "BtrX")
