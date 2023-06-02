@@ -26,16 +26,16 @@
 Перейти в scrum, запланировать новый спринт, состоящий из задач эпика и одного бага, стартовать спринт, провести задачи до состояния Closed. Закрыть спринт.
 
 ---
-[kanban](https://github.com/NamorNinayzuk/mnt-homeworks/blob/MNT-video/09-ci-01-intro/Workflow%20Bugs.xml) "")
+[kanban](https://github.com/NamorNinayzuk/mnt-homeworks/blob/MNT-video/09-ci-01-intro/Workflow%20Bugs.xml) 
 ---
 ---
-[scrum](https://b24-gu7ntr.bitrix24.ru/workgroups/group/4/tasks/?scrum=Y&tab=plan "BtrX")
+[scrum](https://github.com/NamorNinayzuk/mnt-homeworks/blob/MNT-video/09-ci-01-intro/Workflow%20Other%20tasks.xml)
 ---
 
 Если всё отработало в рамках ожидания - выгрузить схемы workflow для импорта в XML. Файлы с workflow приложить к решению задания.
 
 ---
-[Битрикс 24](https://b24-gu7ntr.bitrix24.ru/company/personal/user/1/tasks/ "нет XML на бесплатном тарифе")
+
 ---
 
 ### Как оформить ДЗ?
