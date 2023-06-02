@@ -614,15 +614,6 @@ Finished: SUCCESS
 
 ![multi](img/multi.png)
 
-Запуск сборок отдельно ожидаемо сбоев не дал.
-
-Использование разных веток подтверждается как визуально, так и в логах сборки:
-
-Вывод текста `MAIN` из одного из **stage** для **pipeline** основной **main** ветки
-![multi-main](img/multi-main.png)
-
-Вывод кусочка лога с текстом `It is SECOND branch` из вывода **playbook** второй (**second**) ветки
-![multi-second](img/multi-second.png)
 
 ---
 
@@ -707,9 +698,6 @@ node("linux"){
 }
 ```
 
-Параметризированная сборка выглядит так:
-![scripted-param](img/scripted-param.png)
-
 ---
 
 ### 7. Проверить работоспособность, исправить ошибки, исправленный Pipeline вложить в репозиторий в файл `ScriptedJenkinsfile`.
@@ -730,9 +718,6 @@ fatal: [localhost]: FAILED! => {"changed": false, "module_stderr": "sudo: a pass
   - Выполнить команду `sudo visudo`
   - Добавить в конец файла строку `jenkins  ALL=(ALL) NOPASSWD:ALL`
 
-После внесённых изменений сборка проходит успешно при любом значении параметра:
-![scripted-visual](img/scripted-visual.png)
-> На скриншоте сборка состоит из трёх шагов - средний я добавил для уверенности, что сборка запускается от пользователя `jenkins`
 
 ---
 
