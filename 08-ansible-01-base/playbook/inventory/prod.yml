@@ -1,9 +1,17 @@
 ---
   el:
     hosts:
+      centos7_2:
+        ansible_connection: docker
       centos7:
         ansible_connection: docker
   deb:
     hosts:
       ubuntu:
         ansible_connection: docker
+      ubuntu2:
+        ansible_connection: docker
+  local:
+    hosts:
+      localhost:
+        ansible_connection: local
