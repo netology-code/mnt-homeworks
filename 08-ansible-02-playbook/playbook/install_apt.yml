@@ -1,0 +1,15 @@
+---
+- name: Install Vector | prepare architecture name when x64
+  ansible.builtin.set_fact:
+    architecture_name: amd64
+  when: ansible_architecture == 'x86_64'
+- name: Install Vector | prepare architecture name when x64
+  ansible.builtin.set_fact:
+    architecture_name: undefined
+  when: ansible_architecture !== 'x86_64'
+- name: Install Vector | YUM Install
+  become: true
+  ansible.builtin.apt:
+    deb: https://packages.timber.io/vector/{{ vector_version }}/vector-{{ vector_version }}-1.{{ ansible_architecture }}.deb
+    state: present
+  notify: restart vector service

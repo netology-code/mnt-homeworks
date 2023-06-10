@@ -34,3 +34,16 @@
       register: create_db
       failed_when: create_db.rc != 0 and create_db.rc !=82
       changed_when: create_db.rc == 0
+
+- name: Install Vector
+  hosts: vestor
+  tasks:
+    - name: Vector | Install packege
+      ansible.builtin.include_tasks:
+        file: install_{{ ansible_facts.pkg_mgr }}.yml
+    - name: Vector | Configure vector
+      ansible.builtin.include_tasks:
+        file: configure_vector.yml
+    - name: Vector | Configure service
+      ansible.builtin.include_tasks:
+        file: configure_service.yml
