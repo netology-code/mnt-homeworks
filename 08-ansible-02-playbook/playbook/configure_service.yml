@@ -1,0 +1,7 @@
+---
+- name: Configure Vector | Template system unit
+  ansible.builtin.template:
+    src: vector.service.j2
+    dect: /etc/systend/system/vector.service
+    mode: 0644
+  notify: restart vector service
