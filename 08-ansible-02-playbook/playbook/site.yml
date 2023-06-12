@@ -16,7 +16,7 @@
           dest: "./{{ item }}_{{ clickhouse_version }}_amd64.deb"
         with_items: "{{ clickhouse_packages }}"
       rescue:
-    - name: Get clickhouse distrib
+      - name: Get clickhouse distrib
         ansible.builtin.get_url:
           url: "https://packages.clickhouse.com/deb/pool/main/c/clickhouse/clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
           dest: "./clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
