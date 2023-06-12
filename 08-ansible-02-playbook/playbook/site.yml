@@ -11,21 +11,19 @@
     - block:
         - name: Get clickhouse distrib
           ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.noarch.rpm"
-            dest: "./{{ item }}-{{ clickhouse_version }}.rpm"
+            url: "https://packages.clickhouse.com/deb/pool/main/c/clickhouse/{{ item }}_{{ clickhouse_version }}_amd64.deb"
+            dest: "./{{ item }}_{{ clickhouse_version }}_amd64.deb"
           with_items: "{{ clickhouse_packages }}"
       rescue:
         - name: Get clickhouse distrib
           ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
-            dest: "./clickhouse-common-static-{{ clickhouse_version }}.rpm"
+            url: "https://packages.clickhouse.com/deb/pool/main/c/clickhouse/clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
+            dest: "./clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
     - name: Install clickhouse packages
       become: true
-      ansible.builtin.yum:
-        name:
-          - clickhouse-common-static-{{ clickhouse_version }}.rpm
-          - clickhouse-client-{{ clickhouse_version }}.rpm
-          - clickhouse-server-{{ clickhouse_version }}.rpm
+      ansible.builtin.apt:
+        deb: /home/ubuntu/{{ item }}_{{ clickhouse_version }}_amd64.deb
+      with_items: "{{ clickhouse_packages }}"
       notify: Start clickhouse service
     - name: Flush handlers
       meta: flush_handlers
@@ -36,14 +34,36 @@
       changed_when: create_db.rc == 0
 
 - name: Install Vector
-  hosts: vestor
+  hosts: vector
+  vars_files: 
+    - defaults/main.yml
+
+  handlers:
+    - name: restart vector service
+      become: true
+      ansible.builtin.systemd:
+        name: vector
+        state: restarted
+        daemon_reload: true
+
   tasks:
-    - name: Vector | Install packege
-      ansible.builtin.include_tasks:
-        file: install_{{ ansible_facts.pkg_mgr }}.yml
-    - name: Vector | Configure vector
-      ansible.builtin.include_tasks:
-        file: configure_vector.yml
+    - name: Install Vector | APT Install
+      become: true
+      ansible.builtin.apt:
+        deb: https://packages.timber.io/vector/{{ vector_version }}/vector_{{ vector_version }}-1_amd64.deb
+        #https://packages.timber.io/vector/0.30.0/vector_0.30.0-1_amd64.deb
+      notify: restart vector service
+
+    - name: Configure Vector | ensure what directory exists
+      file:
+        path: "{{ vectore_config_dir }}"
+        state: directory
+        mode: 0644
+    - name: Configure Vector | Template Configure
+      ansible.builtin.template:
+        src: vector.yml.j2
+        mode: '0644'
+        dest: "{{ vectore_config_dir }}/vector.yml"
     - name: Vector | Configure service
       ansible.builtin.include_tasks:
         file: configure_service.yml
