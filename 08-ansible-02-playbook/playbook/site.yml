@@ -2,23 +2,24 @@
 - name: Install Clickhouse
   hosts: clickhouse
   handlers:
-    - name: Start clickhouse service
-      become: true
-      ansible.builtin.service:
-        name: clickhouse-server
-        state: restarted
+  - name: Start clickhouse service
+    become: true
+    ansible.builtin.service:
+      name: clickhouse-server
+      state: restarted
   tasks:
-    - block:
-        - name: Get clickhouse distrib
-          ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/deb/pool/main/c/clickhouse/{{ item }}_{{ clickhouse_version }}_amd64.deb"
-            dest: "./{{ item }}_{{ clickhouse_version }}_amd64.deb"
-          with_items: "{{ clickhouse_packages }}"
+    - name: Block
+      block:
+      - name: Get clickhouse distrib
+        ansible.builtin.get_url:
+          url: "https://packages.clickhouse.com/deb/pool/main/c/clickhouse/{{ item }}_{{ clickhouse_version }}_amd64.deb"
+          dest: "./{{ item }}_{{ clickhouse_version }}_amd64.deb"
+        with_items: "{{ clickhouse_packages }}"
       rescue:
-        - name: Get clickhouse distrib
-          ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/deb/pool/main/c/clickhouse/clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
-            dest: "./clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
+  - name: Get clickhouse distrib
+        ansible.builtin.get_url:
+          url: "https://packages.clickhouse.com/deb/pool/main/c/clickhouse/clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
+          dest: "./clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
     - name: Install clickhouse packages
       become: true
       ansible.builtin.apt:
@@ -26,20 +27,18 @@
       with_items: "{{ clickhouse_packages }}"
       notify: Start clickhouse service
     - name: Flush handlers
-      meta: flush_handlers
+      ansible.builtin.meta: flush_handlers
     - name: Create database
       ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
       register: create_db
-      failed_when: create_db.rc != 0 and create_db.rc !=82
+      failed_when: create_db.rc != 0and create_db.rc !=82
       changed_when: create_db.rc == 0
 
 - name: Install Vector
   hosts: vector
-  vars_files: 
-    - defaults/main.yml
 
   handlers:
-    - name: restart vector service
+    - name: Restart vector service
       become: true
       ansible.builtin.systemd:
         name: vector
@@ -47,22 +46,27 @@
         daemon_reload: true
 
   tasks:
+# - name: Get vector deb
+#   ansible.builtin.get_url:
+#     url: "https://packages.timber.io/vector/{{ vector_version }}/vector-{{ vector_version }}-1.{{ ansible_architecture }}.rpm"
+#     dest: "./vector-{{ vector_version }}.rpm"
+#     mode: '0755'
     - name: Install Vector | APT Install
       become: true
       ansible.builtin.apt:
         deb: https://packages.timber.io/vector/{{ vector_version }}/vector_{{ vector_version }}-1_amd64.deb
-        #https://packages.timber.io/vector/0.30.0/vector_0.30.0-1_amd64.deb
       notify: restart vector service
 
-    - name: Configure Vector | ensure what directory exists
-      file:
+    - name: Configure Vector | Rensure what directory exists
+      ansible.builtin.file:
         path: "{{ vectore_config_dir }}"
         state: directory
-        mode: 0644
+        mode: "0644"
     - name: Configure Vector | Template Configure
+      become: true
       ansible.builtin.template:
         src: vector.yml.j2
-        mode: '0644'
+        mode: "0644"
         dest: "{{ vectore_config_dir }}/vector.yml"
     - name: Vector | Configure service
       ansible.builtin.include_tasks:
