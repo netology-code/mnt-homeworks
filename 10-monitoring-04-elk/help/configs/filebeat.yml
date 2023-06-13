@@ -14,9 +14,7 @@ processors:
 
 output.logstash:
   hosts: ["logstash:5046"]
-
-#output.console:
-#  enabled: true
+  protocol: tcp
 
 logging.json: true
 logging.metrics.enabled: false
