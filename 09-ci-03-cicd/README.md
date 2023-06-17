@@ -25,6 +25,9 @@
 8. Запустите анализатор повторно — проверьте, что QG пройдены успешно.
 9. Сделайте скриншот успешного прохождения анализа, приложите к решению ДЗ.
 
+![SQ](https://github.com/nlotomsk/mnt-homeworks/assets/93542374/66504376-cccc-4e8e-960f-cd3327336c23)
+
+
 ## Знакомство с Nexus
 
 ### Основная часть
@@ -50,6 +53,9 @@
 3. Удалите из `apache-maven-<version>/conf/settings.xml` упоминание о правиле, отвергающем HTTP- соединение — раздел mirrors —> id: my-repository-http-unblocker.
 4. Проверьте `mvn --version`.
 5. Заберите директорию [mvn](./mvn) с pom.
+
+![mvn](https://github.com/nlotomsk/mnt-homeworks/assets/93542374/2ae15895-5578-4930-9e33-8887584457f7)
+
 
 ### Основная часть
 
