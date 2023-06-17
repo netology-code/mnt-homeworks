@@ -1,0 +1,24 @@
+---
+all:
+  hosts:
+  %{~ for i in for_each-vm ~}
+    ${i["name"]}:
+      ansible_host: ${i["network_interface"][0]["nat_ip_address"]} 
+    %{~ endfor ~}
+    %{~ for i in count-vm ~}
+    ${i["name"]}:
+      ansible_host: ${i["network_interface"][0]["nat_ip_address"]}
+    %{~ endfor ~}
+  children:
+    sonarqube:
+      hosts:
+        sonar-01:
+    nexus:
+      hosts:
+        nexus-01:
+    postgres:
+      hosts:
+        sonar-01:
+  vars:
+    ansible_connection_type: paramiko
+    ansible_user: centos

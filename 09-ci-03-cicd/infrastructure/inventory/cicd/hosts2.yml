@@ -2,9 +2,9 @@
 all:
   hosts:
     sonar-01:
-      ansible_host: 51.250.92.178 
+      ansible_host: <somehost2>
     nexus-01:
-      ansible_host: 158.160.61.39
+      ansible_host: <somehost>
   children:
     sonarqube:
       hosts:
@@ -17,4 +17,4 @@ all:
         sonar-01:
   vars:
     ansible_connection_type: paramiko
-    ansible_user: centos
+    ansible_user: <someuser>

@@ -9,16 +9,16 @@
     <repository>
       <id>my-repo</id>
       <name>maven-public</name>
-      <url>http://localhost:8081/repository/maven-public/</url>
+      <url>http://158.160.61.39:8081/repository/maven-public/</url>
     </repository>
   </repositories>
   <dependencies>
-<!--     <dependency>
-      <groupId>somegroup</groupId>
-      <artifactId>someart</artifactId>
-      <version>somevers</version>
-      <classifier>someclass</classifier>
-      <type>sometype</type>
-    </dependency> -->
+    <dependency>
+      <groupId>netology</groupId>
+      <artifactId>java</artifactId>
+      <version>8_282</version>
+      <classifier>distrib</classifier>
+      <type>tar.gz</type>
+    </dependency>
   </dependencies>
 </project>
