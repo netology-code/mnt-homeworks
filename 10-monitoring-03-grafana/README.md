@@ -31,18 +31,18 @@
 ![Графана](https://imgur.com/WSiEe6E)
 ![Заббикс](https://imgur.com/WSiEe6E)
 ## Задание 2
-~~Изучите самостоятельно ресурсы:
+~~ Изучите самостоятельно ресурсы:~~ 
 - [PromQL tutorial for beginners and humans](https://valyala.medium.com/promql-tutorial-for-beginners-9ab455142085)
 - [Understanding Machine CPU usage](https://www.robustperception.io/understanding-machine-cpu-usage)
 - [Introduction to PromQL, the Prometheus query language](https://grafana.com/blog/2020/02/04/introduction-to-promql-the-prometheus-query-language/)
 
-Создайте Dashboard и в ней создайте следующие Panels:
+~~ Создайте Dashboard и в ней создайте следующие Panels:~~ 
 - Утилизация CPU для nodeexporter (в процентах, 100-idle)
 - CPULA 1/5/15
 - Количество свободной оперативной памяти
 - Количество места на файловой системе
 
-Для решения данного ДЗ приведите promql запросы для выдачи этих метрик, а также скриншот получившейся Dashboard.~~
+~~ Для решения данного ДЗ приведите promql запросы для выдачи этих метрик, а также скриншот получившейся Dashboard. ~~
 
 ## Задание 3
 Создайте для каждой Dashboard подходящее правило alert (можно обратиться к первой лекции в блоке "Мониторинг").
