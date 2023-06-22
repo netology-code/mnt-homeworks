@@ -15,15 +15,15 @@
 
 Для решения ДЗ - приведите скриншот вашей итоговой Dashboard.
 
-[Asterisk Aktive Peers](help/asrerisk.png)
+![Asterisk Aktive Peers](help/asrerisk.png)
 
-[Mikrotic](help/mikrotik.png)
+![Mikrotic](help/mikrotik.png)
 
 Так же настроена система оповещения в телеграмм-бот:
 
-[Notification](help/notification.png)
+![Notification](help/notification.png)
 
-[Message](help/messange.png)
+![Message](help/messange.png)
 
 
 Готовый скрипт для [telegram](https://github.com/NamorNinayzuk/mnt-homeworks/tree/MNT-video/10-monitoring-03-grafana/help/telegram.sh) 
@@ -49,7 +49,7 @@ message="$3"
 
 ---
 Листинг и файл:
-[Json](https://github.com/NamorNinayzuk/mnt-homeworks/edit/MNT-video/10-monitoring-03-grafana/gr.json)
+![Json](https://github.com/NamorNinayzuk/mnt-homeworks/edit/MNT-video/10-monitoring-03-grafana/gr.json)
 
 ---
 
