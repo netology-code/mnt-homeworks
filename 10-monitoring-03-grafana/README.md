@@ -6,9 +6,9 @@
 Сделал иначе, на работе поднял графану с такими же метриками как у заббикса
 Решение домашнего задания - скриншот веб-интерфейса grafana со списком подключенных Datasource.
 
-[Графана](help/Grafana.png)
+![Графана](help/Grafana.png)
 
-[Заббикс](help/Zabbix.png)
+![Заббикс](help/Zabbix.png)
 ## Задание 2 and
 ## Задание 3
 В графане было добавлено еще две панельки с метриками это Asterisk Aktive Peers и входящий исходящий траффик от роутера Mikrotic 
@@ -26,7 +26,7 @@
 [Message](help/messange.png)
 
 
-Готовый скрипт для **telegram** [telegram](https://github.com/NamorNinayzuk/mnt-homeworks/tree/MNT-video/10-monitoring-03-grafana/help/telegram.sh) 
+Готовый скрипт для [telegram](https://github.com/NamorNinayzuk/mnt-homeworks/tree/MNT-video/10-monitoring-03-grafana/help/telegram.sh) 
 
 ```#!/bin/bash
 
