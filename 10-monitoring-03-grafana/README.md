@@ -49,7 +49,7 @@ message="$3"
 
 ---
 Листинг и файл:
-![Json](https://github.com/NamorNinayzuk/mnt-homeworks/edit/MNT-video/10-monitoring-03-grafana/gr.json)
+[Json](https://github.com/NamorNinayzuk/mnt-homeworks/edit/MNT-video/10-monitoring-03-grafana/gr.json)
 
 ---
 
