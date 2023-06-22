@@ -14,13 +14,19 @@
 В графане было добавлено еще две панельки с метриками это Asterisk Aktive Peers и входящий исходящий траффик от роутера Mikrotic 
 
 Для решения ДЗ - приведите скриншот вашей итоговой Dashboard.
+
 [Asterisk Aktive Peers](help/asrerisk.png)
+
 [Mikrotic](help/mikrotik.png)
+
 Так же настроена система оповещения в телеграмм-бот:
+
 [Notification](help/notification.png)
+
 [Message](help/messange.png)
 
-Готовый скрипт для **telegram**(help/telegram.sh)
+
+Готовый скрипт для **telegram** [telegram](https://github.com/NamorNinayzuk/mnt-homeworks/tree/MNT-video/10-monitoring-03-grafana/help/telegram.sh) 
 
 ```#!/bin/bash
 
