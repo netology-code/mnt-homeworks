@@ -30,10 +30,10 @@
       notify: Start clickhouse service
     - name: Flush handlers
       ansible.builtin.meta: flush_handlers
-    - name: Create database
-      ansible.builtin.command: "{{clickhouse-client}} -q 'create database logs;'"
+    - name: Create_database_
+      ansible.builtin.command: clickhouse-client -q 'create database logs'
       register: create_db
-      failed_when: create_db.rc != 0 and create_db.rc !=82
+      failed_when: create_db.rc != 0 and create_db.rc != 82
       changed_when: create_db.rc == 0
 
 - name: Install Vector
@@ -70,6 +70,10 @@
         src: vector.yml.j2
         mode: "0644"
         dest: "{{ vectore_config_dir }}/vector.yml"
-    - name: Vector | Configure service
-      ansible.builtin.include_tasks:
-        file: configure_service.yml
+    - name: Configure Vector | Template system unit
+      become: true
+      ansible.builtin.template:
+        src: vector.service.j2
+        dest: "/etc/systemd/system/vector.service"
+        mode: "0644"
+      notify: restart vector service
