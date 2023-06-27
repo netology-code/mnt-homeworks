@@ -29,7 +29,7 @@ Free cloud account имеет следующие ограничения:
 Для выполнения задание предоставьте скриншот `Stack trace` из этого события и список событий проекта, 
 после нажатия `Resolved`.
 
-![Stack trace](10-monitoring-05-sentry/img/Stack trace.png)
+![Stack trace](10-monitoring-05-sentry/img/Stack_trace.png)
 
 ## Задание 3
 
@@ -54,7 +54,7 @@ Free cloud account имеет следующие ограничения:
 Выбирайте разные условия отправки и создавайте sample events. 
 
 ---
-[Projects](img/sentry_projects.json)
+[Project_Sentry.json](img/sentry_project.json)
 ---
 
 ### Как оформить ДЗ?
