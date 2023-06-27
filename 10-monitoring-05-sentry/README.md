@@ -29,7 +29,7 @@ Free cloud account имеет следующие ограничения:
 Для выполнения задание предоставьте скриншот `Stack trace` из этого события и список событий проекта, 
 после нажатия `Resolved`.
 
-![Stack trace](10-monitoring-05-sentry/img/Stack_trace.png)
+![Stack trace](img/Stack_trace.png)
 
 ## Задание 3
 
