@@ -48,16 +48,11 @@
         daemon_reload: true
 
   tasks:
-# - name: Get vector deb
-#   ansible.builtin.get_url:
-#     url: "https://packages.timber.io/vector/{{ vector_version }}/vector-{{ vector_version }}-1.{{ ansible_architecture }}.rpm"
-#     dest: "./vector-{{ vector_version }}.rpm"
-#     mode: '0755'
     - name: Install Vector | APT Install
       become: true
       ansible.builtin.apt:
         deb: https://packages.timber.io/vector/{{ vector_version }}/vector_{{ vector_version }}-1_amd64.deb
-      notify: restart vector service
+      notify: Restart vector service
 
     - name: Configure Vector | Rensure what directory exists
       ansible.builtin.file:
@@ -76,4 +71,4 @@
         src: vector.service.j2
         dest: "/etc/systemd/system/vector.service"
         mode: "0644"
-      notify: restart vector service
+      notify: Restart vector service
