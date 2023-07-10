@@ -1,0 +1,32 @@
+# Desired version of vector
+vector_version: "0.30.0"
+# Path to vector configs
+vectore_config_dir: "{{ ansible_user_dir }}/vector_config"
+
+# Vector config dir
+clickhouse_user: loger
+clickhouse_password: loger
+dest_host: clickhouse
+vector_config:
+  sources:
+    source_log_file:
+      type: file
+      ignore_older_secs: 600
+      include:
+        - "{{ ansible_user_dir }}/test.log"
+      read_from: beginning
+  sinks:
+      clickhouse:
+        type: clickhouse
+        inputs: 
+          - source_log_file
+        auth: 
+          user: "{{ clickhouse_user }}"
+          password: "{{ clickhouse_password }}"
+          strategy: basic
+        compression: gzip
+        database: logs
+        encoding: null
+        endpoint: "http://{{ dest_host }}:8123"
+        skip_unknown_fields: null
+        table: test_logs

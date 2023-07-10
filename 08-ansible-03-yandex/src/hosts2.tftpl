@@ -1,0 +1,24 @@
+---
+clickhouse:
+  hosts:
+  %{~ for i in for_each-vm ~}
+    ${i["name"]}:
+      ansible_host: ${i["network_interface"][0]["nat_ip_address"]} 
+      ansible_user: ubuntu
+    %{~ endfor ~}
+
+vector:
+  hosts:
+  %{~ for i in count-vm ~}
+    ${i["name"]}:
+      ansible_host: ${i["network_interface"][0]["nat_ip_address"]}
+      ansible_user: ubuntu 
+    %{~ endfor ~}
+
+lighthouse:
+  hosts:
+  %{~ for i in lighthouse ~}
+    ${i["name"]}:
+      ansible_host: ${i["network_interface"][0]["nat_ip_address"]}
+      ansible_user: ubuntu 
+    %{~ endfor ~}

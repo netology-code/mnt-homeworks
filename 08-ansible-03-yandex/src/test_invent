@@ -1,0 +1,15 @@
+---
+clickhouse:
+  hosts:
+
+        netology-develop-platform-db-one:
+          ansible_host: 158.160.38.191 
+
+
+[count-vm]
+netology-develop-platform-web-0   ansible_host=158.160.43.215
+---
+clickhouse:
+  hosts:
+    clickhouse-01:
+      ansible_host: <IP_here>

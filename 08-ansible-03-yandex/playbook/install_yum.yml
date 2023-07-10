@@ -1,0 +1,7 @@
+---
+- name: Install Vector | YUM Install
+  become: true
+  ansible.builtin.yum:
+    name: https://packages.timber.io/vector/{{ vector_version }}/vector-{{ vector_version }}-1.{{ ansible_architecture }}.rpm
+    state: present
+  notify: restart vector service

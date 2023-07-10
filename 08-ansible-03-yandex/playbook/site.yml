@@ -1,0 +1,74 @@
+---
+- name: Install Clickhouse
+  hosts: clickhouse
+  handlers:
+    - name: Start clickhouse service
+      become: true
+      ansible.builtin.service:
+        name: clickhouse-server
+        state: restarted
+  tasks:
+    - name: Block
+      block:
+        - name: Get clickhouse distrib (1st solution)
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com/deb/pool/main/c/clickhouse/{{ item }}_{{ clickhouse_version }}_amd64.deb"
+            dest: "./{{ item }}_{{ clickhouse_version }}_amd64.deb"
+            mode: "0644"
+          with_items: "{{ clickhouse_packages }}"
+      rescue:
+        - name: Get clickhouse distrib (2st solution)
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com/deb/pool/main/c/clickhouse/clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
+            dest: "./clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
+            mode: "0644"
+    - name: Install clickhouse packages
+      become: true
+      ansible.builtin.apt:
+        deb: /home/ubuntu/{{ item }}_{{ clickhouse_version }}_amd64.deb
+      with_items: "{{ clickhouse_packages }}"
+      notify: Start clickhouse service
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+    - name: Create_database_
+      ansible.builtin.command: clickhouse-client -q 'create database logs'
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc != 82
+      changed_when: create_db.rc == 0
+
+- name: Install Vector
+  hosts: vector
+
+  handlers:
+    - name: Restart vector service
+      become: true
+      ansible.builtin.systemd:
+        name: vector
+        state: restarted
+        daemon_reload: true
+
+  tasks:
+    - name: Install Vector | APT Install
+      become: true
+      ansible.builtin.apt:
+        deb: https://packages.timber.io/vector/{{ vector_version }}/vector_{{ vector_version }}-1_amd64.deb
+      notify: Restart vector service
+
+    - name: Configure Vector | Rensure what directory exists
+      ansible.builtin.file:
+        path: "{{ vectore_config_dir }}"
+        state: directory
+        mode: "0644"
+    - name: Configure Vector | Template Configure
+      become: true
+      ansible.builtin.template:
+        src: vector.yml.j2
+        mode: "0644"
+        dest: "{{ vectore_config_dir }}/vector.yml"
+    - name: Configure Vector | Template system unit
+      become: true
+      ansible.builtin.template:
+        src: vector.service.j2
+        dest: "/etc/systemd/system/vector.service"
+        mode: "0644"
+      notify: Restart vector service
