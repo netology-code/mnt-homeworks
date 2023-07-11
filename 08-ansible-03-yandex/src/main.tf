@@ -19,11 +19,11 @@ resource "local_file" "hosts_cfg" {
     { 
        for_each-vm = yandex_compute_instance.platform-2,
        count-vm = yandex_compute_instance.web,
-       lighthouse = yandex_compute_instance.platform-2
+       lighthouse = yandex_compute_instance.lighthouse
     } 
   )
 
-  filename = "/home/senibratov/github/mnt-homeworks/08-ansible-03-playbook/playbook/inventory/inventory.yml"
+  filename = "/home/senibratov/github/mnt-homeworks/08-ansible-03-yandex/playbook/inventory/inventory.yml"
 } 
 
 

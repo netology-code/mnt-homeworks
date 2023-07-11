@@ -1,8 +1,8 @@
 resource "yandex_compute_instance" "lighthouse" {
     depends_on = [yandex_compute_instance.web]
   for_each = {
-    #0 = var.forwarded_settings_l_one[0]
-    1 = var.forwarded_settings_l_two[0]
+    0 = var.forwarded_settings_l_one[0]
+    #1 = var.forwarded_settings_l_two[0]
   }
     #name = "netology-${local.env}-${local.project}-${local.role.1}-${each.value.vm_name}"
     name = "${local.role.2}-${each.value.vm_name}"

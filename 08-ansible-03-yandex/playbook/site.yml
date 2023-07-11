@@ -72,3 +72,17 @@
         dest: "/etc/systemd/system/vector.service"
         mode: "0644"
       notify: Restart vector service
+
+- name: Install Nginx(Lighthouse)
+  hosts: lighthouse
+
+  tasks:
+    - name: Download nginx
+      ansible.builtin.get_url:
+        url: "https://nginx.org/download/nginx-{{ nginx_version }}.tar.gz"
+        dest: "./nginx-{{ nginx_version }}"
+        mode: "0644"
+    - name: Extract nginx into
+      ansible.builtin.unarchive:
+        src: "./nginx-{{ nginx_version }}/nginx-{{ nginx_version }}.tar.gz"
+        dest: "./nginx-{{ nginx_version }}"
