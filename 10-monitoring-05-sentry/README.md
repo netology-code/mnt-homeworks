@@ -19,6 +19,9 @@ Free Cloud account имеет ограничения:
 
 В качестве решения задания пришлите скриншот меню Projects.
 
+![image](https://github.com/nlotomsk/mnt-homeworks/assets/93542374/f7251261-87bd-4400-93af-23528fd9fbb4)
+
+
 ## Задание 2
 
 1. Создайте python-проект и нажмите `Generate sample event` для генерации тестового события.
