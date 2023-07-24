@@ -22,7 +22,7 @@
    ---
      - src: git@github.com:AlexeySetevoi/ansible-clickhouse.git
        scm: git
-       version: "1.11.0"
+       version: "1.13"
        name: clickhouse 
    ```
 
