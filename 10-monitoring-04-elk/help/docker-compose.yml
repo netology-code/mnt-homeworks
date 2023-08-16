@@ -4,23 +4,21 @@
 ##kibana address: http://127.0.0.1:5601 будет доступно через ~1-2 мин
 #
 #
-version: '2.2'
+version: "2.3"
 services:
-
   es-hot:
-    image: elasticsearch:8.7.0
+    image: elasticsearch:8.8.0
     container_name: es-hot
     environment:
       - node.name=es-hot
       - cluster.name=es-docker-cluster
       - discovery.seed_hosts=es-hot,es-warm
       - cluster.initial_master_nodes=es-hot,es-warm
-      - node.roles=master,data_content,data_hot  
+      - node.roles=master,data_content,data_hot
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "http.host=0.0.0.0"
       - xpack.security.enabled=false
     volumes:
-      - data01:/usr/share/elasticsearch/data:Z
+      - data01:/usr/share/elasticsearch/data
     ulimits:
       memlock:
         soft: -1
@@ -36,7 +34,7 @@ services:
       - es-warm
 
   es-warm:
-    image: elasticsearch:8.7.0
+    image: elasticsearch:8.8.0
     container_name: es-warm
     environment:
       - node.name=es-warm
@@ -46,9 +44,8 @@ services:
       - node.roles=master,data_warm
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - xpack.security.enabled=false
-      - "http.host=0.0.0.0"
     volumes:
-      - data02:/usr/share/elasticsearch/data:Z
+      - data02:/usr/share/elasticsearch/data
     ulimits:
       memlock:
         soft: -1
@@ -60,7 +57,7 @@ services:
       - elastic
 
   kibana:
-    image: kibana:8.7.0
+    image: kibana:8.8.0
     container_name: kibana
     ports:
       - 5601:5601
@@ -81,8 +78,8 @@ services:
       - 5046:5046
       - 5044:5044
     volumes:
-      - ./configs/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:Z
-      - ./configs/logstash.yml:/opt/logstash/config/logstash.yml:Z
+      - ./configs/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./configs/logstash.yml:/opt/logstash/config/logstash.yml
     networks:
       - elastic
     depends_on:
@@ -96,9 +93,9 @@ services:
     user: root
     command: filebeat -e -strict.perms=false
     volumes:
-      - ./configs/filebeat.yml:/usr/share/filebeat/filebeat.yml:Z
-      - /var/lib/docker:/var/lib/docker:Z
-      - /var/run/docker.sock:/var/run/docker.sock:Z
+      - ./configs/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/lib/docker:/var/lib/docker
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - logstash
     networks:
@@ -108,7 +105,7 @@ services:
     image: library/python:3.9-alpine
     container_name: some_app
     volumes:
-      - ./pinger/:/opt/:Z
+      - ./pinger/:/opt/
     entrypoint: python3 /opt/run.py
 
 volumes:

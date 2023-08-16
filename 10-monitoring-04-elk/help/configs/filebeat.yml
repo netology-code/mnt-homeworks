@@ -13,7 +13,8 @@ processors:
       overwrite_keys: true
 
 output.logstash:
-  hosts: ["logstash:5046"]
+  #hosts: ["logstash:5046"]
+  hosts: ["logstash:5044"]
   protocol: tcp
 
 logging.json: true
