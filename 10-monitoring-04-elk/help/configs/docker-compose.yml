@@ -1,0 +1,121 @@
+##Предварительно выполнить на Linux хосте команду: sudo sysctl -w vm.max_map_count=262144
+##https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_set_vm_max_map_count_to_at_least_262144
+#
+##kibana address: http://127.0.0.1:5601 будет доступно через ~1-2 мин
+#
+#
+version: "3.8"
+services:
+  es-hot:
+    image: elasticsearch:8.9.0
+    container_name: es-hot
+    environment:
+      - node.name=es-hot
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es-hot,es-warm
+      - cluster.initial_master_nodes=es-hot,es-warm
+      - node.roles=master,data_content,data_hot
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+    #depends_on:
+    #  - es-warm
+
+  # es-warm:
+  #   image: elasticsearch:7.0.0
+  #   container_name: es-warm
+  #   environment:
+  #     - node.name=es-warm
+  #     - cluster.name=es-docker-cluster
+  #     - discovery.seed_hosts=es-hot,es-warm
+  #     - cluster.initial_master_nodes=es-hot,es-warm
+  #     - node.roles=master,data_warm
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #     - xpack.security.enabled=false
+  #   volumes:
+  #     - data02:/usr/share/elasticsearch/data
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #     nofile:
+  #       soft: 65536
+  #       hard: 65536
+  #   networks:
+  #     - elastic
+
+  # kibana:
+  #   image: kibana:7.0.0
+  #   container_name: kibana
+  #   ports:
+  #     - 5601:5601
+  #   environment:
+  #     ELASTICSEARCH_URL: http://es-hot:9200
+  #     ELASTICSEARCH_HOSTS: '["http://es-hot:9200","http://es-warm:9200"]'
+  #   networks:
+  #     - elastic
+  #   depends_on:
+  #     - es-hot
+  #     - es-warm
+
+  # logstash:
+  #   image: logstash:6.5.1
+
+  #   container_name: logstash
+  #   ports:
+  #     - 5046:5046
+  #     - 5044:5044
+  #   volumes:
+  #     - ./configs/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+  #     - ./configs/logstash.yml:/opt/logstash/config/logstash.yml
+  #   networks:
+  #     - elastic
+  #   depends_on:
+  #     - es-hot
+  #     - es-warm
+
+  # filebeat:
+  #   image: elastic/filebeat:7.2.0
+  #   container_name: filebeat
+  #   privileged: true
+  #   user: root
+  #   command: filebeat -e -strict.perms=false
+  #   volumes:
+  #     - ./configs/filebeat.yml:/usr/share/filebeat/filebeat.yml
+  #     - /var/lib/docker:/var/lib/docker
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   depends_on:
+  #     - logstash
+  #   networks:
+  #     - elastic
+
+  # some_application:
+  #   image: library/python:3.9-alpine
+  #   container_name: some_app
+  #   volumes:
+  #     - ./pinger/:/opt/
+  #   entrypoint: python3 /opt/run.py
+
+volumes:
+  data01:
+    driver: local
+  data02:
+    driver: local
+  data03:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
