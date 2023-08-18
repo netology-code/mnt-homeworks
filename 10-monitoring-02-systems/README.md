@@ -36,6 +36,13 @@
 
 P.S.: если при запуске некоторые контейнеры будут падать с ошибкой - проставьте им режим `Z`, например
 `./data:/var/lib:Z`
+
+![image](https://github.com/nlotomsk/mnt-homeworks_old/assets/93542374/5ee2057f-e141-447c-89fa-94e1c259305b)
+
+
+![image](https://github.com/nlotomsk/mnt-homeworks_old/assets/93542374/ac0d8eb2-7862-4c81-b442-e06dc6f71f06)
+
+
 #
 8. Перейдите в веб-интерфейс Chronograf (http://localhost:8888) и откройте вкладку Data explorer.
         
