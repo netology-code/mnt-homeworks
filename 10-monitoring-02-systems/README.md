@@ -60,8 +60,7 @@ SLI = (summ_2xx_requests + summ_3xx_requests) / (summ_all_requests)
 5. Опишите основные плюсы и минусы pull и push систем мониторинга.
 #
 
-|pull|
-|:---:|
+pull
 
 |&#10133;|&#10134;|
 |:----:|:----:|
