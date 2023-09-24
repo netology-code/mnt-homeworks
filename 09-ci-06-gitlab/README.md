@@ -63,5 +63,5 @@
 
 ## Необязательная часть
 
-Если вы уже знакомы с k8s можете попробоать запустить gitlab server и gitlab runner в k8s  [по инструкции](https://cloud.yandex.ru/docs/tutorials/infrastructure-management/gitlab-containers). 
+Если вы уже знакомы с k8s можете попробовать выполнить задание, запустив gitlab server и gitlab runner в k8s  [по инструкции](https://cloud.yandex.ru/docs/tutorials/infrastructure-management/gitlab-containers). 
 
