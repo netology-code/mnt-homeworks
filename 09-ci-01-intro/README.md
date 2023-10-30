@@ -2,7 +2,7 @@
 
 ## Подготовка к выполнению
 
-1. Получить бесплатную версию [Jira](www.atlassian.com/ru/software/jira/free).
+1. Получить бесплатную версию [Jira](https://www.atlassian.com/ru/software/jira/free).
 2. Настроить её для своей команды разработки.
 3. Создать доски Kanban и Scrum.
 4. [Дополнительные инструкции от разработчика Jira](https://support.atlassian.com/jira-cloud-administration/docs/import-and-export-issue-workflows/).
